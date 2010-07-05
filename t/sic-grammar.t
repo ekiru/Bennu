@@ -19,4 +19,3 @@ my $sic =
 
 ok ($/ = SIC::Grammar.parse($sic)), 'Parses the SIC for "say 42;".';
 ok $<version_line><version> eq '2010.08', 'Parses the version line.';
-say $/<block>;
