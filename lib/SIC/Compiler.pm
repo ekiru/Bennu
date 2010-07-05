@@ -20,8 +20,9 @@ sub local_var($n) {
 
 multi method compile(Str $sic) {
     return self.new.compile($sic) unless self.defined;
-    my SIC::AST::File $ast =
-        SIC::Grammar.parse($sic, :actions(SIC::Actions.new)).ast;
+    my $parse = SIC::Grammar.parse($sic, :actions(SIC::Actions.new));
+    die "Could not parse." unless $parse;
+    my SIC::AST::File $ast = $parse.ast;
     return self.compile($ast);
 }
 
