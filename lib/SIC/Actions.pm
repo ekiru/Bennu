@@ -43,29 +43,31 @@ method block ($/) {
     $block.env = SIC::AST::Environment.new;
     for $<statement> -> $statement {
         $block.body.push($statement.ast);
-        for $statement.ast.find-locals -> $local {
-            $block.env.variables{$local} = 1;
-        }
-        for $statement.ast.find-constants -> $constant {
-            $block.env.constants{$constant} = 1;
-        }
     }
 
     make $block;
 }
 
 method statement:sym<=> ($/) {
-    make SIC::AST::Assignment.new($<variable>.ast, $<constant>.ast);
+    make SIC::AST::Assignment.new($<register>.ast, $<value>.ast);
 }
 
 method statement:sym<say> ($/) {
-    make SIC::AST::SayCall.new($<variable>.ast);
+    make SIC::AST::SayCall.new($<register>.ast);
 }
 
-method variable ($/) {
-    make SIC::AST::Variable.new(:number($0));
+method statement:sym<store> ($/) {
+    make SIC::AST::Store.new(:variable(~$0), :register($<register>.ast));
 }
 
-method constant ($/) {
+method register ($/) {
+    make SIC::AST::Register.new(:number($0));
+}
+
+method value:sym<constant> ($/) {
     make SIC::AST::Constant.new(:value($0));
+}
+
+method value:sym<fetch> ($/) {
+    make SIC::AST::Fetch.new(:variable(~$0));
 }

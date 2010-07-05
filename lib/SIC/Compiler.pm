@@ -53,7 +53,7 @@ multi method emit(SIC::AST::Block $block, Str @output) {
 
 multi method emit(SIC::AST::Assignment $statement, Str @output) {
     @output.push(local_var($statement.lhs.number) ~ 
-                 ' = add i32 0, ' ~ $statement.rhs.value);
+                 ' = add i32 0, ' ~ $statement.rhs.LLVMvalue ~ '');
 }
 
 multi method emit(SIC::AST::SayCall $statement, Str @output) {
@@ -62,4 +62,9 @@ multi method emit(SIC::AST::SayCall $statement, Str @output) {
                  'i64 0, i64 0');
     @output.push('call i32 (i8*, ...)* @printf(i8* ' ~ $temp ~ ', ' ~
                  'i32 ' ~ local_var($statement.argument.number) ~ ')');
+}
+
+multi method emit (SIC::AST::Store $statement, Str @output) {
+    @output.push('%' ~ $statement.variable ~ ' = add i32 0, ' ~
+                 local_var($statement.register.number));
 }
