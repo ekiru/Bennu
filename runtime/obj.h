@@ -5,5 +5,6 @@
 #define BENNU_OBJ_MCACHE 1	/* nonzero to enable global method cache        */
 
 typedef struct bennu_vtable bennu_vtable;
+typedef struct bennu_object bennu_object;
 
 #endif /* BENNU_OBJ_H */
