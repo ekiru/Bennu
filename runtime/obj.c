@@ -74,26 +74,6 @@ bennu_object *closure_new(imp_t method, bennu_object *data)
 
 bennu_object *vtable_lookup(bennu_closure *closure, bennu_vtable *self, bennu_object *key);
 
-#if BENNU_OBJ_ICACHE
-# define send(RCV, MSG, ARGS...) ({				\
-      struct        object   *r = (bennu_object *)(RCV);	\
-      static bennu_vtable   *prevVT  = 0;			\
-      static bennu_closure  *closure = 0;			\
-      register bennu_vtable *thisVT  = r->_vt[-1];		\
-      thisVT == prevVT						\
-	?  closure						\
-	: (prevVT  = thisVT,					\
-	   closure = bind(r, (MSG)));				\
-      closure->method(closure, r, ##ARGS);			\
-    })
-#else
-# define send(RCV, MSG, ARGS...) ({				\
-      bennu_object  *r = (bennu_object *)(RCV);		\
-      bennu_closure *c = bind(r, (MSG));			\
-      c->method(c, r, ##ARGS);					\
-    })
-#endif
-
 #if BENNU_OBJ_MCACHE
 struct entry {
   bennu_vtable  *vtable;
