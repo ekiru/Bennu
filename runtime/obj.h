@@ -9,6 +9,8 @@ typedef struct bennu_object bennu_object;
 typedef struct bennu_closure bennu_closure;
 typedef struct bennu_symbol bennu_symbol;
 
+typedef bennu_object *(*bennu_meth_t)(bennu_closure *closure, bennu_object *receiver, ...);
+
 #if BENNU_OBJ_ICACHE
 # define BENNU_OBJ_SEND(RCV, MSG, ARGS...) ({				\
       struct        object   *r = (bennu_object *)(RCV);	\

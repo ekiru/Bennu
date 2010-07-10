@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef bennu_object *(*imp_t)(bennu_closure *closure, bennu_object *receiver, ...);
-
 struct bennu_vtable
 {
   bennu_vtable  *_vt[0];
@@ -27,7 +25,7 @@ struct bennu_object {
 struct bennu_closure
 {
   bennu_vtable *_vt[0];
-  imp_t		 method;
+  bennu_meth_t		 method;
   bennu_object *data;
 };
 
@@ -58,7 +56,7 @@ bennu_object *symbol_new(char *string)
   return (bennu_object *)symbol;
 }
 
-bennu_object *closure_new(imp_t method, bennu_object *data)
+bennu_object *closure_new(bennu_meth_t method, bennu_object *data)
 {
   bennu_closure *closure = (bennu_closure *)bennu_obj_alloc(sizeof(bennu_closure));
   closure->_vt[-1] = closure_vt;
@@ -116,7 +114,7 @@ bennu_object *vtable_allocate(bennu_closure *closure, bennu_vtable *self, int pa
   return object;
 }
 
-imp_t vtable_addMethod(bennu_closure *closure, bennu_vtable *self, bennu_object *key, imp_t method)
+bennu_meth_t vtable_addMethod(bennu_closure *closure, bennu_vtable *self, bennu_object *key, bennu_meth_t method)
 {
   int i;
   for (i = 0;  i < self->tally;  ++i)
@@ -179,8 +177,8 @@ void bennu_obj_init(void)
   bennu_s_allocate  = symbol_intern(0, 0, "allocate");
   bennu_s_delegated = symbol_intern(0, 0, "delegated");
 
-  vtable_addMethod(0, vtable_vt, bennu_s_lookup,    (imp_t)vtable_lookup);
-  vtable_addMethod(0, vtable_vt, bennu_s_addMethod, (imp_t)vtable_addMethod);
+  vtable_addMethod(0, vtable_vt, bennu_s_lookup,    (bennu_meth_t)vtable_lookup);
+  vtable_addMethod(0, vtable_vt, bennu_s_addMethod, (bennu_meth_t)vtable_addMethod);
 
   BENNU_OBJ_SEND(vtable_vt, bennu_s_addMethod, bennu_s_allocate,    vtable_allocate);
   BENNU_OBJ_SEND(vtable_vt, bennu_s_addMethod, bennu_s_delegated,   vtable_delegated);
