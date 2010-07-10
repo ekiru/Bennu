@@ -8,10 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct closure;
 struct symbol;
 
-typedef bennu_object *(*imp_t)(struct closure *closure, bennu_object *receiver, ...);
+typedef bennu_object *(*imp_t)(bennu_closure *closure, bennu_object *receiver, ...);
 
 struct bennu_vtable
 {
@@ -27,7 +26,7 @@ struct bennu_object {
   bennu_vtable *_vt[0];
 };
 
-struct closure
+struct bennu_closure
 {
   bennu_vtable *_vt[0];
   imp_t		 method;
@@ -68,20 +67,20 @@ bennu_object *symbol_new(char *string)
 
 bennu_object *closure_new(imp_t method, bennu_object *data)
 {
-  struct closure *closure = (struct closure *)alloc(sizeof(struct closure));
+  bennu_closure *closure = (bennu_closure *)alloc(sizeof(bennu_closure));
   closure->_vt[-1] = closure_vt;
   closure->method  = method;
   closure->data    = data;
   return (bennu_object *)closure;
 }
 
-bennu_object *vtable_lookup(struct closure *closure, bennu_vtable *self, bennu_object *key);
+bennu_object *vtable_lookup(bennu_closure *closure, bennu_vtable *self, bennu_object *key);
 
 #if BENNU_OBJ_ICACHE
 # define send(RCV, MSG, ARGS...) ({				\
       struct        object   *r = (bennu_object *)(RCV);	\
       static bennu_vtable   *prevVT  = 0;			\
-      static struct closure  *closure = 0;			\
+      static bennu_closure  *closure = 0;			\
       register bennu_vtable *thisVT  = r->_vt[-1];		\
       thisVT == prevVT						\
 	?  closure						\
@@ -92,7 +91,7 @@ bennu_object *vtable_lookup(struct closure *closure, bennu_vtable *self, bennu_o
 #else
 # define send(RCV, MSG, ARGS...) ({				\
       bennu_object  *r = (bennu_object *)(RCV);		\
-      struct closure *c = bind(r, (MSG));			\
+      bennu_closure *c = bind(r, (MSG));			\
       c->method(c, r, ##ARGS);					\
     })
 #endif
@@ -101,13 +100,13 @@ bennu_object *vtable_lookup(struct closure *closure, bennu_vtable *self, bennu_o
 struct entry {
   bennu_vtable  *vtable;
   bennu_object  *selector;
-  struct closure *closure;
+  bennu_closure *closure;
 } MethodCache[8192];
 #endif
 
-struct closure *bind(bennu_object *rcv, bennu_object *msg)
+bennu_closure *bind(bennu_object *rcv, bennu_object *msg)
 {
-  struct closure *c;
+  bennu_closure *c;
   bennu_vtable  *vt = rcv->_vt[-1];
 #if BENNU_OBJ_MCACHE
   struct entry   *cl = MethodCache + ((((unsigned)vt << 2) ^ ((unsigned)msg >> 3)) & ((sizeof(MethodCache) / sizeof(struct entry)) - 1));
@@ -115,8 +114,8 @@ struct closure *bind(bennu_object *rcv, bennu_object *msg)
     return cl->closure;
 #endif
   c = ((msg == s_lookup) && (rcv == (bennu_object *)vtable_vt))
-    ? (struct closure *)vtable_lookup(0, vt, msg)
-    : (struct closure *)send(vt, s_lookup, msg);
+    ? (bennu_closure *)vtable_lookup(0, vt, msg)
+    : (bennu_closure *)send(vt, s_lookup, msg);
 #if BENNU_OBJ_MCACHE
   cl->vtable   = vt;
   cl->selector = msg;
@@ -125,7 +124,7 @@ struct closure *bind(bennu_object *rcv, bennu_object *msg)
   return c;
 }
 
-bennu_vtable *vtable_delegated(struct closure *closure, bennu_vtable *self)
+bennu_vtable *vtable_delegated(bennu_closure *closure, bennu_vtable *self)
 {
   bennu_vtable *child= (bennu_vtable *)alloc(sizeof(bennu_vtable));
   child->_vt[-1] = self ? self->_vt[-1] : 0;
@@ -137,19 +136,19 @@ bennu_vtable *vtable_delegated(struct closure *closure, bennu_vtable *self)
   return child;
 }
 
-bennu_object *vtable_allocate(struct closure *closure, bennu_vtable *self, int payloadSize)
+bennu_object *vtable_allocate(bennu_closure *closure, bennu_vtable *self, int payloadSize)
 {
   bennu_object *object = (bennu_object *)alloc(payloadSize);
   object->_vt[-1] = self;
   return object;
 }
 
-imp_t vtable_addMethod(struct closure *closure, bennu_vtable *self, bennu_object *key, imp_t method)
+imp_t vtable_addMethod(bennu_closure *closure, bennu_vtable *self, bennu_object *key, imp_t method)
 {
   int i;
   for (i = 0;  i < self->tally;  ++i)
     if (key == self->keys[i])
-      return ((struct closure *)self->values[i])->method = method;
+      return ((bennu_closure *)self->values[i])->method = method;
   if (self->tally == self->size)
     {
       self->size  *= 2;
@@ -161,7 +160,7 @@ imp_t vtable_addMethod(struct closure *closure, bennu_vtable *self, bennu_object
   return method;
 }
 
-bennu_object *vtable_lookup(struct closure *closure, bennu_vtable *self, bennu_object *key)
+bennu_object *vtable_lookup(bennu_closure *closure, bennu_vtable *self, bennu_object *key)
 {
   int i;
   for (i = 0;  i < self->tally;  ++i)
@@ -173,7 +172,7 @@ bennu_object *vtable_lookup(struct closure *closure, bennu_vtable *self, bennu_o
   return 0;
 }
 
-bennu_object *symbol_intern(struct closure *closure, bennu_object *self, char *string)
+bennu_object *symbol_intern(bennu_closure *closure, bennu_object *self, char *string)
 {
   bennu_object *symbol;
   int i;

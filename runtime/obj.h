@@ -6,5 +6,6 @@
 
 typedef struct bennu_vtable bennu_vtable;
 typedef struct bennu_object bennu_object;
+typedef struct bennu_closure bennu_closure;
 
 #endif /* BENNU_OBJ_H */
