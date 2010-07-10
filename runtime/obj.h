@@ -10,7 +10,7 @@ typedef struct bennu_closure bennu_closure;
 typedef struct bennu_symbol bennu_symbol;
 
 #if BENNU_OBJ_ICACHE
-# define send(RCV, MSG, ARGS...) ({				\
+# define BENNU_OBJ_SEND(RCV, MSG, ARGS...) ({				\
       struct        object   *r = (bennu_object *)(RCV);	\
       static bennu_vtable   *prevVT  = 0;			\
       static bennu_closure  *closure = 0;			\
@@ -22,7 +22,7 @@ typedef struct bennu_symbol bennu_symbol;
       closure->method(closure, r, ##ARGS);			\
     })
 #else
-# define send(RCV, MSG, ARGS...) ({				\
+# define BENNU_OBJ_SEND(RCV, MSG, ARGS...) ({				\
       bennu_object  *r = (bennu_object *)(RCV);		\
       bennu_closure *c = bind(r, (MSG));			\
       c->method(c, r, ##ARGS);					\
