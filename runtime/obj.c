@@ -165,7 +165,7 @@ bennu_object *symbol_intern(bennu_closure *closure, bennu_object *self, char *st
   return symbol;
 }
 
-void init(void)
+void bennu_obj_init(void)
 {
   vtable_vt = vtable_delegated(0, 0);
   vtable_vt->_vt[-1] = vtable_vt;

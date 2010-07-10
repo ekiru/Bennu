@@ -29,4 +29,6 @@ typedef struct bennu_symbol bennu_symbol;
     })
 #endif
 
+void bennu_obj_init(void); /* Used to initialize the object system. */
+
 #endif /* BENNU_OBJ_H */
