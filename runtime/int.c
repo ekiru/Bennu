@@ -1,7 +1,5 @@
 #include "int.h"
 
-#include "obj.h"
-
 bennu_vtable *bennu_int_vtable;
 
 struct bennu_int {
