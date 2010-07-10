@@ -49,7 +49,7 @@ bennu_object *s_allocate  = 0;
 bennu_object *s_delegated = 0;
 bennu_object *s_lookup    = 0;
 
-extern inline void *alloc(size_t size)
+extern inline void *bennu_obj_alloc(size_t size)
 {
   bennu_vtable **ppvt= (bennu_vtable **)calloc(1, sizeof(bennu_vtable *) + size);
   return (void *)(ppvt + 1);
@@ -57,7 +57,7 @@ extern inline void *alloc(size_t size)
 
 bennu_object *symbol_new(char *string)
 {
-  bennu_symbol *symbol = (bennu_symbol *)alloc(sizeof(bennu_symbol));
+  bennu_symbol *symbol = (bennu_symbol *)bennu_obj_alloc(sizeof(bennu_symbol));
   symbol->_vt[-1] = symbol_vt;
   symbol->string = strdup(string);
   return (bennu_object *)symbol;
@@ -65,7 +65,7 @@ bennu_object *symbol_new(char *string)
 
 bennu_object *closure_new(imp_t method, bennu_object *data)
 {
-  bennu_closure *closure = (bennu_closure *)alloc(sizeof(bennu_closure));
+  bennu_closure *closure = (bennu_closure *)bennu_obj_alloc(sizeof(bennu_closure));
   closure->_vt[-1] = closure_vt;
   closure->method  = method;
   closure->data    = data;
@@ -104,7 +104,7 @@ bennu_closure *bind(bennu_object *rcv, bennu_object *msg)
 
 bennu_vtable *vtable_delegated(bennu_closure *closure, bennu_vtable *self)
 {
-  bennu_vtable *child= (bennu_vtable *)alloc(sizeof(bennu_vtable));
+  bennu_vtable *child= (bennu_vtable *)bennu_obj_alloc(sizeof(bennu_vtable));
   child->_vt[-1] = self ? self->_vt[-1] : 0;
   child->size    = 2;
   child->tally   = 0;
@@ -116,7 +116,7 @@ bennu_vtable *vtable_delegated(bennu_closure *closure, bennu_vtable *self)
 
 bennu_object *vtable_allocate(bennu_closure *closure, bennu_vtable *self, int payloadSize)
 {
-  bennu_object *object = (bennu_object *)alloc(payloadSize);
+  bennu_object *object = (bennu_object *)bennu_obj_alloc(payloadSize);
   object->_vt[-1] = self;
   return object;
 }
