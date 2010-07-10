@@ -8,26 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct bennu_vtable
-{
-  bennu_vtable  *_vt[0];
-  int             size;
-  int             tally;
-  bennu_object **keys;
-  bennu_object **values;
-  bennu_vtable  *parent;
-};
-
-struct bennu_object {
-  bennu_vtable *_vt[0];
-};
-
-struct bennu_closure
-{
-  bennu_vtable *_vt[0];
-  bennu_meth_t		 method;
-  bennu_object *data;
-};
+bennu_object *bennu_s_addMethod = 0;
+bennu_object *bennu_s_allocate = 0;
+bennu_object *bennu_s_delegated = 0;
+bennu_object *bennu_s_lookup = 0;
 
 struct bennu_symbol
 {
@@ -37,11 +21,12 @@ struct bennu_symbol
 
 bennu_vtable *SymbolList= 0;
 
+bennu_vtable *bennu_object_vtable;
 bennu_vtable *vtable_vt;
 bennu_vtable *symbol_vt;
 bennu_vtable *closure_vt;
 
-extern inline void *bennu_obj_alloc(size_t size)
+void *bennu_obj_alloc(size_t size)
 {
   bennu_vtable **ppvt= (bennu_vtable **)calloc(1, sizeof(bennu_vtable *) + size);
   return (void *)(ppvt + 1);
@@ -74,7 +59,7 @@ struct entry {
 } MethodCache[8192];
 #endif
 
-bennu_closure *bind(bennu_object *rcv, bennu_object *msg)
+bennu_closure *bennu_obj_bind(bennu_object *rcv, bennu_object *msg)
 {
   bennu_closure *c;
   bennu_vtable  *vt = rcv->_vt[-1];
