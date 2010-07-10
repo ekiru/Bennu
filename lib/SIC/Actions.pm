@@ -49,7 +49,9 @@ method block ($/) {
 }
 
 method statement:sym<=> ($/) {
-    make SIC::AST::Assignment.new($<register>.ast, $<value>.ast);
+    my $result = $<rhs>.ast;
+    $result.lhs = $<register>.ast;
+    make $result;
 }
 
 method statement:sym<say> ($/) {
@@ -64,10 +66,10 @@ method register ($/) {
     make SIC::AST::Register.new(:number($0));
 }
 
-method value:sym<constant> ($/) {
-    make SIC::AST::Constant.new(:value($0));
+method rhs:sym<constant> ($/) {
+    make SIC::AST::Assignment.new(:rhs(SIC::AST::Constant.new(:value($0))));
 }
 
-method value:sym<fetch> ($/) {
-    make SIC::AST::Fetch.new(:variable(~$0));
+method rhs:sym<fetch> ($/) {
+    make SIC::AST::Fetch.new(:rhs(SIC::AST::Lexical.new(:name(~$0))));
 }

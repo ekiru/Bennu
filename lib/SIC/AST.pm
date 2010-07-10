@@ -6,7 +6,8 @@ class SIC::AST {
 
 class SIC::AST::Environment {...}
 class SIC::AST::Register {...}
-class SIC::AST::Value {...}
+class SIC::AST::Constant {...}
+class SIC::AST::Lexical {...}
 
 class SIC::AST::File is SIC::AST {
     has $.version is rw = '';
@@ -25,16 +26,16 @@ class SIC::AST::Block is SIC::AST {
     has @.body;
 }
 
-class SIC::AST::Statement is SIC::AST {
-}
+class SIC::AST::Statement is SIC::AST { }
 
 class SIC::AST::Assignment is SIC::AST::Statement {
     has SIC::AST::Register $.lhs is rw;
-    has SIC::AST::Value $.rhs is rw;
+    has SIC::AST::Constant $.rhs is rw;
+}
 
-    method new($class: $lhs, $rhs) {
-        $class.bless(*, :$lhs, :$rhs);
-    }
+class SIC::AST::Fetch is SIC::AST::Statement {
+    has SIC::AST::Register $.lhs is rw;
+    has SIC::AST::Lexical $.rhs is rw;
 }
 
 class SIC::AST::SayCall is SIC::AST::Statement {
@@ -58,18 +59,16 @@ class SIC::AST::Value is SIC::AST {
     method LLVMvalue {...}
 }
 
-class SIC::AST::Fetch is SIC::AST::Value {
-    has Str $.variable is rw;
-
-    method LLVMvalue {
-        "\%$.variable";
-    }
-}
-
 class SIC::AST::Constant is SIC::AST {
     has Int $.value is rw;
 
-    method LLVMvalue {
+    method Str {
         ~$.value;
     }
+}
+
+class SIC::AST::Lexical is SIC::AST {
+    has Str $.name is rw;
+
+    method Str { '%' ~ $.name; }
 }

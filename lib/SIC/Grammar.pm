@@ -44,7 +44,7 @@ token block {
 
 proto token statement {...}
 
-token statement:sym<=> { <register> <.ws> <sym> <.ws> <value> }
+token statement:sym<=> { <register> <.ws> <sym> <.ws> <rhs> }
 token statement:sym<say> { <sym> <.ws> <register> }
 token statement:sym<store> {
     <sym> <.ws> "'\$" (<alpha>+) "'," <.ws> <register>
@@ -52,7 +52,7 @@ token statement:sym<store> {
 
 token register { "\$" (\d+) }
 
-proto token value {...}
+proto token rhs {...}
 
-token value:sym<constant> { (\d+) }
-token value:sym<fetch> { <sym> <.ws> "'\$" (<alpha>+) "'" }
+token rhs:sym<constant> { (\d+) }
+token rhs:sym<fetch> { <sym> <.ws> "'\$" (<alpha>+) "'" }

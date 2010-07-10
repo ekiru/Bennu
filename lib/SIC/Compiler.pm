@@ -37,13 +37,18 @@ multi method compile(SIC::AST::File $ast) {
 }
 
 multi method emit-header(SIC::AST::File $file, Str @output) {
-    @output.push('declare i32 @printf (i8*, ...)');
-    @output.push('@INTPRINTF = internal constant [4 x i8] c"%d\0A\00"');
+    @output.push('%obj = type opaque*');
+    @output.push('declare void @bennu_init()');
+    @output.push('declare %obj @bennu_int_new (i32)');
+    @output.push('declare %obj @bennu_say (%obj)');
     @output.push('');
 }
 
 multi method emit(SIC::AST::Block $block, Str @output) {
     @output.push('define i32 @' ~ $block.name ~ ' () {');
+    if $block.name eq 'main' {
+        @output.push('call void @bennu_init()');
+    }
     for $block.body -> $statement {
         self.emit($statement, @output);
     }
@@ -53,18 +58,22 @@ multi method emit(SIC::AST::Block $block, Str @output) {
 
 multi method emit(SIC::AST::Assignment $statement, Str @output) {
     @output.push(local_var($statement.lhs.number) ~ 
-                 ' = add i32 0, ' ~ $statement.rhs.LLVMvalue ~ '');
+                 ' = call %obj @bennu_int_new(i32 ' ~
+                 $statement.rhs ~ ')');
+}
+
+multi method emit(SIC::AST::Fetch $statement, Str @output) {
+    @output.push(local_var($statement.lhs.number) ~ 
+                 ' = bitcast %obj ' ~ $statement.rhs ~ ' to %obj');
 }
 
 multi method emit(SIC::AST::SayCall $statement, Str @output) {
-    my $temp = temp_var();
-    @output.push($temp ~ ' = getelementptr [04 x i8]* @INTPRINTF, ' ~
-                 'i64 0, i64 0');
-    @output.push('call i32 (i8*, ...)* @printf(i8* ' ~ $temp ~ ', ' ~
-                 'i32 ' ~ local_var($statement.argument.number) ~ ')');
+
+    @output.push('call %obj @bennu_say(%obj ' ~
+                 local_var($statement.argument.number) ~ ')');
 }
 
 multi method emit (SIC::AST::Store $statement, Str @output) {
-    @output.push('%' ~ $statement.variable ~ ' = add i32 0, ' ~
-                 local_var($statement.register.number));
+    @output.push('%' ~ $statement.variable ~ ' = bitcast %obj ' ~
+                 local_var($statement.register.number) ~ ' to %obj');
 }
