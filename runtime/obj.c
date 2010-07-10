@@ -38,7 +38,6 @@ struct bennu_symbol
 bennu_vtable *SymbolList= 0;
 
 bennu_vtable *vtable_vt;
-bennu_vtable *object_vt;
 bennu_vtable *symbol_vt;
 bennu_vtable *closure_vt;
 
@@ -163,12 +162,12 @@ void bennu_obj_init(void)
   vtable_vt = vtable_delegated(0, 0);
   vtable_vt->_vt[-1] = vtable_vt;
 
-  object_vt = vtable_delegated(0, 0);
-  object_vt->_vt[-1] = vtable_vt;
-  vtable_vt->parent = object_vt;
+  bennu_object_vtable = vtable_delegated(0, 0);
+  bennu_object_vtable->_vt[-1] = vtable_vt;
+  vtable_vt->parent = bennu_object_vtable;
 
-  symbol_vt  = vtable_delegated(0, object_vt);
-  closure_vt = vtable_delegated(0, object_vt);
+  symbol_vt  = vtable_delegated(0, bennu_object_vtable);
+  closure_vt = vtable_delegated(0, bennu_object_vtable);
 
   SymbolList = vtable_delegated(0, 0);
 

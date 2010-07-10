@@ -39,4 +39,7 @@ bennu_object *bennu_s_allocate  = 0;
 bennu_object *bennu_s_delegated = 0;
 bennu_object *bennu_s_lookup    = 0;
 
+/* Core vtables. */
+bennu_vtable *bennu_object_vtable;
+
 #endif /* BENNU_OBJ_H */
