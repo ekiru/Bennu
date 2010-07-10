@@ -31,4 +31,10 @@ typedef struct bennu_symbol bennu_symbol;
 
 void bennu_obj_init(void); /* Used to initialize the object system. */
 
+/* Basic message symbols. */
+bennu_object *bennu_s_addMethod = 0;
+bennu_object *bennu_s_allocate  = 0;
+bennu_object *bennu_s_delegated = 0;
+bennu_object *bennu_s_lookup    = 0;
+
 #endif /* BENNU_OBJ_H */

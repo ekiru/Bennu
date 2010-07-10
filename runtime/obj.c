@@ -44,11 +44,6 @@ bennu_vtable *object_vt;
 bennu_vtable *symbol_vt;
 bennu_vtable *closure_vt;
 
-bennu_object *s_addMethod = 0;
-bennu_object *s_allocate  = 0;
-bennu_object *s_delegated = 0;
-bennu_object *s_lookup    = 0;
-
 extern inline void *bennu_obj_alloc(size_t size)
 {
   bennu_vtable **ppvt= (bennu_vtable **)calloc(1, sizeof(bennu_vtable *) + size);
@@ -91,9 +86,9 @@ bennu_closure *bind(bennu_object *rcv, bennu_object *msg)
   if (cl->vtable == vt && cl->selector == msg)
     return cl->closure;
 #endif
-  c = ((msg == s_lookup) && (rcv == (bennu_object *)vtable_vt))
+  c = ((msg == bennu_s_lookup) && (rcv == (bennu_object *)vtable_vt))
     ? (bennu_closure *)vtable_lookup(0, vt, msg)
-    : (bennu_closure *)BENNU_OBJ_SEND(vt, s_lookup, msg);
+    : (bennu_closure *)BENNU_OBJ_SEND(vt, bennu_s_lookup, msg);
 #if BENNU_OBJ_MCACHE
   cl->vtable   = vt;
   cl->selector = msg;
@@ -145,7 +140,7 @@ bennu_object *vtable_lookup(bennu_closure *closure, bennu_vtable *self, bennu_ob
     if (key == self->keys[i])
       return self->values[i];
   if (self->parent)
-    return BENNU_OBJ_SEND(self->parent, s_lookup, key);
+    return BENNU_OBJ_SEND(self->parent, bennu_s_lookup, key);
   fprintf(stderr, "lookup failed %p %s\n", self, ((bennu_symbol *)key)->string);
   return 0;
 }
@@ -179,14 +174,14 @@ void bennu_obj_init(void)
 
   SymbolList = vtable_delegated(0, 0);
 
-  s_lookup    = symbol_intern(0, 0, "lookup");
-  s_addMethod = symbol_intern(0, 0, "addMethod");
-  s_allocate  = symbol_intern(0, 0, "allocate");
-  s_delegated = symbol_intern(0, 0, "delegated");
+  bennu_s_lookup    = symbol_intern(0, 0, "lookup");
+  bennu_s_addMethod = symbol_intern(0, 0, "addMethod");
+  bennu_s_allocate  = symbol_intern(0, 0, "allocate");
+  bennu_s_delegated = symbol_intern(0, 0, "delegated");
 
-  vtable_addMethod(0, vtable_vt, s_lookup,    (imp_t)vtable_lookup);
-  vtable_addMethod(0, vtable_vt, s_addMethod, (imp_t)vtable_addMethod);
+  vtable_addMethod(0, vtable_vt, bennu_s_lookup,    (imp_t)vtable_lookup);
+  vtable_addMethod(0, vtable_vt, bennu_s_addMethod, (imp_t)vtable_addMethod);
 
-  BENNU_OBJ_SEND(vtable_vt, s_addMethod, s_allocate,    vtable_allocate);
-  BENNU_OBJ_SEND(vtable_vt, s_addMethod, s_delegated,   vtable_delegated);
+  BENNU_OBJ_SEND(vtable_vt, bennu_s_addMethod, bennu_s_allocate,    vtable_allocate);
+  BENNU_OBJ_SEND(vtable_vt, bennu_s_addMethod, bennu_s_delegated,   vtable_delegated);
 }
