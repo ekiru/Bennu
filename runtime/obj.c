@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct symbol;
-
 typedef bennu_object *(*imp_t)(bennu_closure *closure, bennu_object *receiver, ...);
 
 struct bennu_vtable
@@ -33,7 +31,7 @@ struct bennu_closure
   bennu_object *data;
 };
 
-struct symbol
+struct bennu_symbol
 {
   bennu_vtable *_vt[0];
   char          *string;
@@ -59,7 +57,7 @@ extern inline void *alloc(size_t size)
 
 bennu_object *symbol_new(char *string)
 {
-  struct symbol *symbol = (struct symbol *)alloc(sizeof(struct symbol));
+  bennu_symbol *symbol = (bennu_symbol *)alloc(sizeof(bennu_symbol));
   symbol->_vt[-1] = symbol_vt;
   symbol->string = strdup(string);
   return (bennu_object *)symbol;
@@ -168,7 +166,7 @@ bennu_object *vtable_lookup(bennu_closure *closure, bennu_vtable *self, bennu_ob
       return self->values[i];
   if (self->parent)
     return send(self->parent, s_lookup, key);
-  fprintf(stderr, "lookup failed %p %s\n", self, ((struct symbol *)key)->string);
+  fprintf(stderr, "lookup failed %p %s\n", self, ((bennu_symbol *)key)->string);
   return 0;
 }
 
@@ -179,7 +177,7 @@ bennu_object *symbol_intern(bennu_closure *closure, bennu_object *self, char *st
   for (i = 0;  i < SymbolList->tally;  ++i)
     {
       symbol = SymbolList->keys[i];
-      if (!strcmp(string, ((struct symbol *)symbol)->string))
+      if (!strcmp(string, ((bennu_symbol *)symbol)->string))
 	return symbol;
     }
   symbol = symbol_new(string);
