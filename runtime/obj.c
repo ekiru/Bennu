@@ -8,11 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct object;
 struct closure;
 struct symbol;
 
-typedef struct object *(*imp_t)(struct closure *closure, struct object *receiver, ...);
+typedef bennu_object *(*imp_t)(struct closure *closure, bennu_object *receiver, ...);
 
 struct bennu_vtable
 {
