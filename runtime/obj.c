@@ -2,53 +2,51 @@
  *  It was initially developed by Ian Piumarta.
  */
 
+#include "obj.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define ICACHE 1	/* nonzero to enable point-of-send inline cache */
-#define MCACHE 1	/* nonzero to enable global method cache        */
-
-struct vtable;
 struct object;
 struct closure;
 struct symbol;
 
 typedef struct object *(*imp_t)(struct closure *closure, struct object *receiver, ...);
 
-struct vtable
+struct bennu_vtable
 {
-  struct vtable  *_vt[0];
+  bennu_vtable  *_vt[0];
   int             size;
   int             tally;
   struct object **keys;
   struct object **values;
-  struct vtable  *parent;
+  bennu_vtable  *parent;
 };
 
 struct object {
-  struct vtable *_vt[0];
+  bennu_vtable *_vt[0];
 };
 
 struct closure
 {
-  struct vtable *_vt[0];
+  bennu_vtable *_vt[0];
   imp_t		 method;
   struct object *data;
 };
 
 struct symbol
 {
-  struct vtable *_vt[0];
+  bennu_vtable *_vt[0];
   char          *string;
 };
 
-struct vtable *SymbolList= 0;
+bennu_vtable *SymbolList= 0;
 
-struct vtable *vtable_vt;
-struct vtable *object_vt;
-struct vtable *symbol_vt;
-struct vtable *closure_vt;
+bennu_vtable *vtable_vt;
+bennu_vtable *object_vt;
+bennu_vtable *symbol_vt;
+bennu_vtable *closure_vt;
 
 struct object *s_addMethod = 0;
 struct object *s_allocate  = 0;
@@ -57,7 +55,7 @@ struct object *s_lookup    = 0;
 
 extern inline void *alloc(size_t size)
 {
-  struct vtable **ppvt= (struct vtable **)calloc(1, sizeof(struct vtable *) + size);
+  bennu_vtable **ppvt= (bennu_vtable **)calloc(1, sizeof(bennu_vtable *) + size);
   return (void *)(ppvt + 1);
 }
 
@@ -78,14 +76,14 @@ struct object *closure_new(imp_t method, struct object *data)
   return (struct object *)closure;
 }
 
-struct object *vtable_lookup(struct closure *closure, struct vtable *self, struct object *key);
+struct object *vtable_lookup(struct closure *closure, bennu_vtable *self, struct object *key);
 
-#if ICACHE
+#if BENNU_OBJ_ICACHE
 # define send(RCV, MSG, ARGS...) ({				\
       struct        object   *r = (struct object *)(RCV);	\
-      static struct vtable   *prevVT  = 0;			\
+      static bennu_vtable   *prevVT  = 0;			\
       static struct closure  *closure = 0;			\
-      register struct vtable *thisVT  = r->_vt[-1];		\
+      register bennu_vtable *thisVT  = r->_vt[-1];		\
       thisVT == prevVT						\
 	?  closure						\
 	: (prevVT  = thisVT,					\
@@ -100,9 +98,9 @@ struct object *vtable_lookup(struct closure *closure, struct vtable *self, struc
     })
 #endif
 
-#if MCACHE
+#if BENNU_OBJ_MCACHE
 struct entry {
-  struct vtable  *vtable;
+  bennu_vtable  *vtable;
   struct object  *selector;
   struct closure *closure;
 } MethodCache[8192];
@@ -111,8 +109,8 @@ struct entry {
 struct closure *bind(struct object *rcv, struct object *msg)
 {
   struct closure *c;
-  struct vtable  *vt = rcv->_vt[-1];
-#if MCACHE
+  bennu_vtable  *vt = rcv->_vt[-1];
+#if BENNU_OBJ_MCACHE
   struct entry   *cl = MethodCache + ((((unsigned)vt << 2) ^ ((unsigned)msg >> 3)) & ((sizeof(MethodCache) / sizeof(struct entry)) - 1));
   if (cl->vtable == vt && cl->selector == msg)
     return cl->closure;
@@ -120,7 +118,7 @@ struct closure *bind(struct object *rcv, struct object *msg)
   c = ((msg == s_lookup) && (rcv == (struct object *)vtable_vt))
     ? (struct closure *)vtable_lookup(0, vt, msg)
     : (struct closure *)send(vt, s_lookup, msg);
-#if MCACHE
+#if BENNU_OBJ_MCACHE
   cl->vtable   = vt;
   cl->selector = msg;
   cl->closure  = c;
@@ -128,9 +126,9 @@ struct closure *bind(struct object *rcv, struct object *msg)
   return c;
 }
 
-struct vtable *vtable_delegated(struct closure *closure, struct vtable *self)
+bennu_vtable *vtable_delegated(struct closure *closure, bennu_vtable *self)
 {
-  struct vtable *child= (struct vtable *)alloc(sizeof(struct vtable));
+  bennu_vtable *child= (bennu_vtable *)alloc(sizeof(bennu_vtable));
   child->_vt[-1] = self ? self->_vt[-1] : 0;
   child->size    = 2;
   child->tally   = 0;
@@ -140,14 +138,14 @@ struct vtable *vtable_delegated(struct closure *closure, struct vtable *self)
   return child;
 }
 
-struct object *vtable_allocate(struct closure *closure, struct vtable *self, int payloadSize)
+struct object *vtable_allocate(struct closure *closure, bennu_vtable *self, int payloadSize)
 {
   struct object *object = (struct object *)alloc(payloadSize);
   object->_vt[-1] = self;
   return object;
 }
 
-imp_t vtable_addMethod(struct closure *closure, struct vtable *self, struct object *key, imp_t method)
+imp_t vtable_addMethod(struct closure *closure, bennu_vtable *self, struct object *key, imp_t method)
 {
   int i;
   for (i = 0;  i < self->tally;  ++i)
@@ -164,7 +162,7 @@ imp_t vtable_addMethod(struct closure *closure, struct vtable *self, struct obje
   return method;
 }
 
-struct object *vtable_lookup(struct closure *closure, struct vtable *self, struct object *key)
+struct object *vtable_lookup(struct closure *closure, bennu_vtable *self, struct object *key)
 {
   int i;
   for (i = 0;  i < self->tally;  ++i)
