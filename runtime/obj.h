@@ -1,6 +1,8 @@
 #ifndef BENNU_OBJ_H
 #define BENNU_OBJ_H
 
+#include <stdlib.h>
+
 #define BENNU_OBJ_ICACHE 1	/* nonzero to enable point-of-send inline cache */
 #define BENNU_OBJ_MCACHE 1	/* nonzero to enable global method cache        */
 
@@ -53,8 +55,13 @@ struct bennu_closure
 #endif
 
 void bennu_obj_init(void); /* Used to initialize the object system. */
+/* Allocate a bennu_object of the supplied size. */
+void *bennu_obj_alloc(size_t size);
 /* Used by BENNU_OBJ_SEND. */
 bennu_closure *bennu_obj_bind(bennu_object *rcv, bennu_object *msg);
+
+/* Interns a symbol and returns it. */
+bennu_object *bennu_symbol_intern(bennu_closure *closure, bennu_object *self, char *string);
 
 /* Basic message symbols. */
 extern bennu_object *bennu_s_addMethod;

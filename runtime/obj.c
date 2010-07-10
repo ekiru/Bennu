@@ -127,7 +127,7 @@ bennu_object *vtable_lookup(bennu_closure *closure, bennu_vtable *self, bennu_ob
   return 0;
 }
 
-bennu_object *symbol_intern(bennu_closure *closure, bennu_object *self, char *string)
+bennu_object *bennu_symbol_intern(bennu_closure *closure, bennu_object *self, char *string)
 {
   bennu_object *symbol;
   int i;
@@ -156,10 +156,10 @@ void bennu_obj_init(void)
 
   SymbolList = vtable_delegated(0, 0);
 
-  bennu_s_lookup    = symbol_intern(0, 0, "lookup");
-  bennu_s_addMethod = symbol_intern(0, 0, "addMethod");
-  bennu_s_allocate  = symbol_intern(0, 0, "allocate");
-  bennu_s_delegated = symbol_intern(0, 0, "delegated");
+  bennu_s_lookup    = bennu_symbol_intern(0, 0, "lookup");
+  bennu_s_addMethod = bennu_symbol_intern(0, 0, "addMethod");
+  bennu_s_allocate  = bennu_symbol_intern(0, 0, "allocate");
+  bennu_s_delegated = bennu_symbol_intern(0, 0, "delegated");
 
   vtable_addMethod(0, vtable_vt, bennu_s_lookup,    (bennu_meth_t)vtable_lookup);
   vtable_addMethod(0, vtable_vt, bennu_s_addMethod, (bennu_meth_t)vtable_addMethod);
