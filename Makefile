@@ -1,3 +1,6 @@
+# Shamelessly stolen from http://github.com/masak/yapsi/blob/master/Makefile
+# With alpha replaced with perl6 & SOURCES changed to my sources.
+
 PERL6 = perl6
 
 SOURCES=lib/SIC/AST.pm lib/SIC/Grammar.pm \
