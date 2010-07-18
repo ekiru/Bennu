@@ -14,3 +14,9 @@ sub MAIN($filename?) {
     my $sic = $file.slurp;
     .say for SIC::Compiler.new.compile($sic);
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
