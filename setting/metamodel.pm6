@@ -16,6 +16,10 @@ class Symbol { ... }
 # with a single fixed argument of type pointer[Object] returning
 # pointer[Object]
 subset Method where True;
+# Alternately, given that we probably will need to be using an array for
+# parameter-passing, something like the following works, I think, although
+# the second parameter might be a pointer[LowLevelArray] or something.
+subset Method where &:(pointer[Object], pointer[Object]);
 
 class Object is raw-struct {
     has pointer[Vtable] $.vtable;
@@ -129,6 +133,10 @@ my pointer[Object] sub symbol-intern(pointer[Object] $self,
     return $symbol;
 }
 
+# Frankly, I'm not sure how this translates to C. I'm not sure how to do
+# this in C without forcing everything to use some sort of array for
+# parameters. That's probably necessary anyway so *@args will probably
+# instead need to be some kind of low-level array.
 my pointer[Object] sub send(pointer[Object] $self,
 			    pointer[Object] $message,
 			    pointer[Object] *@args)
