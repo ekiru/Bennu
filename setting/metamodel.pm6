@@ -1,11 +1,37 @@
+# A mostly translation without micro-optimizations of the object system in
+# Piumarta and Warth's "Open, extensible object models" paper. I plan to
+# stick with at least a conceptually analogous base for the object system.
+# Or at least, for the default metamodel. Given that it will be implemented
+# in Perl 6 with a bunch of bootstrapping pragmas, other object models
+# should be able to be implemented with equal control without relying on
+# the default, although maybe that won't be necessary (perhaps the spec
+# will eventually allow portable ways of creating new metamodels without
+# relying on the default, though that problem may be unsolvable).
+
+# One thing to note is that I haven't included casts in the code. I've not
+# yet decided how to represent them syntactically yet.
+
 use v6;
-use bootstrap::raw-structs;
+# This gives us the raw-struct class trait.
+use bootstrap::raw-struct;
+# This gives us the raw-function sub trait.
+use bootstrap::raw-function;
+# This might not end up being used, but it means that only explicit return
+# statements return from subs.
 use bootstrap::explicit-return;
+# All containers must be explicit.
 use bootstrap::no-containers;
-use bootstrap::c-ops <sizeof + == * ??!!>;
+# bootstrap::c-ops makes Perl 6's ops do the appropriate C one.
+# Note that == will be just C ==, not numeric equality.
+use bootstrap::c-ops;
+# Now we have some C types available. pointer[T] is equivalent to *T.
+# void is valid as a pointer type and a return type.
 use bootstrap::c-types <pointer char int void>;
+# #include <stdio.h>
 use bootstrap::libc::stdio <fprintf stderr>;
+# #include <stdlib.h>
 use bootstrap::libc::stdlib <NULL calloc realloc size_t>;
+# #include <string.h>
 use bootstrap::libc::string <strcmp strdup>;
 
 class Vtable { ... }
@@ -17,14 +43,19 @@ class Symbol { ... }
 # pointer[Object]
 subset Method where True;
 # Alternately, given that we probably will need to be using an array for
-# parameter-passing, something like the following works, I think, although
-# the second parameter might be a pointer[LowLevelArray] or something.
-subset Method where &:(pointer[Object], pointer[Object]);
+# parameter-passing, something like the following works, I think.
+# subset Method where &:(pointer[Object], pointer[LowLevelArray]);
 
+# Raw-struct basically means that it creates the equivalent of a C struct.
+# Each attribute has imaginary accessors such that $foo.bar is C's foo.bar
+# if $foo is a Object, and C's foo->bar if $foo is a pointer[Object].
+# Probably. Maybe there'll be a different op for C's ->
 class Object is raw-struct {
     has pointer[Vtable] $.vtable;
 }
 
+# For raw-structs, inheritance just means sticking the parent's members
+# at the front of it.
 class Vtable is raw-struct is Object {
     has int $.size;
     has int $.tally;
@@ -34,7 +65,7 @@ class Vtable is raw-struct is Object {
 }
 
 class Symbol is raw-struct is Object {
-    has pointer[char] $.string;
+    has pointer[char] $.string; # maybe have an explicit c-string type.
 }
 
 my pointer[Vtable] $vtable-vt = $libc::NULL;
@@ -50,6 +81,8 @@ my pointer[Object] $intern-symbol = $libc::NULL;
 my pointer[Object] $symbol = $libc::NULL;
 my pointer[Object] $symbol-list = $libc::NULL;
 
+# raw-function basically means it's just like a normal C function.
+# The actual detailed semantics of this, I don't know.
 my pointer[void] sub alloc(libc::size_t $size) is raw-function {
     return libc::calloc(1, $size + sizeof(pointer[Vtable]));
 }
