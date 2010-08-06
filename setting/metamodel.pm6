@@ -1,4 +1,4 @@
-# A mostly translation without micro-optimizations of the object system in
+# Mostly a translation without micro-optimizations of the object system in
 # Piumarta and Warth's "Open, extensible object models" paper. I plan to
 # stick with at least a conceptually analogous base for the object system.
 # Or at least, for the default metamodel. Given that it will be implemented
