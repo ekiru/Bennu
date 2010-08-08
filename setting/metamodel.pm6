@@ -35,6 +35,8 @@ use bootstrap::libc::stdlib <NULL calloc realloc size_t>;
 # #include <string.h>
 use bootstrap::libc::string <strcmp strdup>;
 
+class LowLevelHash { ... }
+
 class Vtable { ... }
 class Object { ... }
 class Symbol { ... }
@@ -49,18 +51,45 @@ subset Method where True;
 
 # Raw-struct basically means that it creates the equivalent of a C struct.
 # Each attribute has imaginary accessors such that $foo.bar is C's foo.bar
-# if $foo is a Object, and C's foo->bar if $foo is a pointer[Object].
+# if $foo is a LowLevelHash, and C's foo->bar if $foo is a pointer[LLH].
 # Probably. Maybe there'll be a different op for C's ->
-class Object is raw-struct {
-    has pointer[Vtable] $.vtable;
-}
-
 class LowLevelHash is raw-struct {
     has int $.size;
     has int $.tally;
     has pointer[pointer[Object]] $.keys;
     has pointer[pointer[Object]] $.values;
 }
+
+class Object is raw-struct {
+    has pointer[Vtable] $.vtable;
+}
+
+# For raw-structs, inheritance just means sticking the parent's members
+# at the front of it.
+class Vtable is raw-struct is Object {
+    has pointer[LowLevelHash] $.methods;
+    has pointer[Vtable] $.parent;
+}
+
+class Symbol is raw-struct is Object {
+    has pointer[char] $.string; # maybe have an explicit c-string type.
+}
+
+my pointer[Vtable] $vtable-vt = $libc::NULL;
+my pointer[Vtable] $object-vt = $libc::NULL;
+my pointer[Vtable] $symbol-vt = $libc::NULL;
+
+my pointer[Object] $add-method-symbol = $libc::NULL;
+my pointer[Object] $allocate-symbol = $libc::NULL;
+my pointer[Object] $delegated-symbol = $libc::NULL;
+my pointer[Object] $lookup-symbol = $libc::NULL;
+my pointer[Object] $intern-symbol = $libc::NULL;
+
+my pointer[Object] $symbol = $libc::NULL;
+my pointer[LowLevelHash] $symbol-list = $libc::NULL;
+
+# raw-function basically means it's just like a normal C function.
+# The actual detailed semantics of this, I don't know.
 
 my pointer[LowLevelHash] sub low-level-hash-allocate() is raw-function {
     $self.size = 2;
@@ -100,32 +129,6 @@ my pointer[Object] sub low-level-hash-get(pointer[LowLevelHash] $self,
     return $libc::NULL;
 }
 
-# For raw-structs, inheritance just means sticking the parent's members
-# at the front of it.
-class Vtable is raw-struct is Object {
-    has pointer[LowLevelHash] $.methods;
-    has pointer[Vtable] $.parent;
-}
-
-class Symbol is raw-struct is Object {
-    has pointer[char] $.string; # maybe have an explicit c-string type.
-}
-
-my pointer[Vtable] $vtable-vt = $libc::NULL;
-my pointer[Vtable] $object-vt = $libc::NULL;
-my pointer[Vtable] $symbol-vt = $libc::NULL;
-
-my pointer[Object] $add-method-symbol = $libc::NULL;
-my pointer[Object] $allocate-symbol = $libc::NULL;
-my pointer[Object] $delegated-symbol = $libc::NULL;
-my pointer[Object] $lookup-symbol = $libc::NULL;
-my pointer[Object] $intern-symbol = $libc::NULL;
-
-my pointer[Object] $symbol = $libc::NULL;
-my pointer[LowLevelHash] $symbol-list = $libc::NULL;
-
-# raw-function basically means it's just like a normal C function.
-# The actual detailed semantics of this, I don't know.
 my pointer[void] sub alloc(libc::size_t $size) is raw-function {
     return libc::calloc(1, $size + sizeof(pointer[Vtable]));
 }
