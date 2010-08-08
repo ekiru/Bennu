@@ -51,17 +51,17 @@ subset Method where True;
 
 # Raw-struct basically means that it creates the equivalent of a C struct.
 # Each attribute has imaginary accessors such that $foo.bar is C's foo.bar
-# if $foo is a LowLevelHash, and C's foo->bar if $foo is a pointer[LLH].
+# if $foo is an Object, and C's foo->bar if $foo is a pointer[Object].
 # Probably. Maybe there'll be a different op for C's ->
-class LowLevelHash is raw-struct {
+class Object is raw-struct {
+    has pointer[Vtable] $.vtable;
+}
+
+class LowLevelHash is raw-struct is Object {
     has int $.size;
     has int $.tally;
     has pointer[pointer[Object]] $.keys;
     has pointer[pointer[Object]] $.values;
-}
-
-class Object is raw-struct {
-    has pointer[Vtable] $.vtable;
 }
 
 # For raw-structs, inheritance just means sticking the parent's members
