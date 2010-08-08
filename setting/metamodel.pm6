@@ -1,3 +1,4 @@
+use v6;
 # Mostly a translation without micro-optimizations of the object system in
 # Piumarta and Warth's "Open, extensible object models" paper. I plan to
 # stick with at least a conceptually analogous base for the object system.
@@ -11,7 +12,7 @@
 # One thing to note is that I haven't included casts in the code. I've not
 # yet decided how to represent them syntactically yet.
 
-use v6;
+
 # This gives us the raw-struct class trait.
 use bootstrap::raw-struct;
 # This gives us the raw-function sub trait.
@@ -54,13 +55,55 @@ class Object is raw-struct {
     has pointer[Vtable] $.vtable;
 }
 
-# For raw-structs, inheritance just means sticking the parent's members
-# at the front of it.
-class Vtable is raw-struct is Object {
+class LowLevelHash is raw-struct {
     has int $.size;
     has int $.tally;
     has pointer[pointer[Object]] $.keys;
     has pointer[pointer[Object]] $.values;
+}
+
+my void sub low-level-hash-init(pointer[LowLevelHash] $self) is raw-function {
+    $self.size = 2;
+    $self.tally = 0;
+    $self.keys = libc::calloc($self.size, sizeof(pointer[Object]));
+    $self.values = libc::calloc($self.size, sizeof(pointer[Object]));
+}
+
+my void low-level-hash-set(pointer[LowLevelHash] $self,
+                           pointer[Object] $key,
+                           pointer[Object] $value) {
+    loop (my int $i = 0; i < $self.tally; ++$i) {
+	if $key == $self.keys[$i] {
+	    $self.value[i] = $value;
+            return;
+	}
+    }
+    if $self.tally == $self.size {
+	$self.size *= 2;
+	$self.keys = libc::realloc($self.keys,
+				   sizeof(pointer[Object]) * $self.size);
+	$self.values = libc::realloc($self.value,
+				     sizeof(pointer[Object]) * $self.size);
+    }
+    $self.keys[$self.tally] = $key;
+    $self.values[$self.tally++] = $value;
+}
+
+my pointer[Object] sub low-level-hash-get(pointer[LowLevelHash] $self,
+                                          pointer[Object] $key)
+  is raw-function {
+    loop (my int $i = 0; $i < $self.tally; ++$i) {
+	if $key == $self.keys[$i] {
+	    return $self.values[i];
+	}
+    }
+    return $libc::NULL;
+}
+
+# For raw-structs, inheritance just means sticking the parent's members
+# at the front of it.
+class Vtable is raw-struct is Object {
+    has LowLevelHash $.methods;
     has pointer[Vtable] $.parent;
 }
 
@@ -79,7 +122,7 @@ my pointer[Object] $lookup-symbol = $libc::NULL;
 my pointer[Object] $intern-symbol = $libc::NULL;
 
 my pointer[Object] $symbol = $libc::NULL;
-my pointer[Object] $symbol-list = $libc::NULL;
+my LowLevelHash $symbol-list = $libc::NULL;
 
 # raw-function basically means it's just like a normal C function.
 # The actual detailed semantics of this, I don't know.
@@ -110,10 +153,7 @@ my pointer[Vtable] sub vtable-delegated(pointer[Vtable] $self)
     } else {
 	$child.vtable = $libc::NULL;
     }
-    $child.size = 2;
-    $child.tally = 0;
-    $child.keys = libc::calloc($child.size, sizeof(pointer[Object]));
-    $child.values = libc::calloc($child.size, sizeof(pointer[Object]));
+    low-level-hash-init(address-of $child.methods);
     $child.parent = $self;
     return $child;
 }
@@ -122,31 +162,16 @@ my pointer[Object] sub $vtable-add-method(pointer[Vtable] $self,
 				       pointer[Object] $key,
 				       pointer[Object] $method)
   is raw-function {
-    loop (my int $i = 0; i < $self.tally; ++$i) {
-	if $key == $self.keys[$i] {
-	    return $self.value[i] = $method;
-	}
-    }
-    if $self.tally == $self.size {
-	$self.size *= 2;
-	$self.keys = libc::realloc($self.keys,
-				   sizeof(pointer[Object]) * $self.size);
-	$self.values = libc::realloc($self.value,
-				     sizeof(pointer[Object]) * $self.size);
-    }
-    $self.keys[$self.tally] = $key;
-    $self.values[$self.tally++] = $method;
+    low-level-hash-set(address-of($self.methods), $key, $method);
     return $method;
 }
 
 my pointer[Object] sub vtable-lookup(pointer[Vtable] $self,
 				     pointer[Object] $key)
   is raw-function {
-    loop (my int $i = 0; $i < $self.tally; ++$i) {
-	if $key == $self.keys[$i] {
-	    return $self.values[i];
-	}
-    }
+    my pointer[Object] $result = 
+      low-level-hash-get(address-of($self.methods), $key);
+    return $result if $result;
     libc::fprintf($libc::stderr, "lookup failed \%p \%s\n", $key.string);
     return $libc::NULL;
 }
@@ -162,7 +187,7 @@ my pointer[Object] sub symbol-intern(pointer[Object] $self,
 	}
     }
     $symbol = symbol-new($string);
-    vtable-add-method($symbol-list, $symbol, 0);
+    low-level-hash-set($symbol-list, $symbol, 1);
     return $symbol;
 }
 
@@ -180,6 +205,7 @@ my pointer[Object] sub send(pointer[Object] $self,
 }
 
 my sub metamodel-init() {
+    low-level-hash-init(address-of $symbol-list);
     $vtable-vt = vtable-delegated($libc::NULL);
     $vtable-vt.vtable = $vtable-vt;
 
@@ -188,7 +214,6 @@ my sub metamodel-init() {
     $vtable-vt.parent = $object-vt;
 
     $symbol-vt = vtable-delegated($object-vt);
-    $symbol-list = vtable-delegated($libc::NULL);
 
     $lookup-symbol = symbol-intern $libc::NULL, "lookup";
     vtable-add-method $vtable-vt, $lookup-symbol, &vtable-lookup;
