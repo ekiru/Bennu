@@ -68,6 +68,7 @@ class Object is raw-struct {
 # at the front of it.
 class Vtable is raw-struct is Object {
     has pointer[LowLevelHash] $.methods;
+    has pointer[LowLevelHash] $.attributes;
     has pointer[Vtable] $.parent;
 }
 
