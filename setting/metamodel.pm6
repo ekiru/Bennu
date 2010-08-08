@@ -76,6 +76,7 @@ class Symbol is raw-struct is Object {
     has pointer[char] $.string; # maybe have an explicit c-string type.
 }
 
+my pointer[Vtable] $low-level-hash-vt = $libc::NULL;
 my pointer[Vtable] $vtable-vt = $libc::NULL;
 my pointer[Vtable] $object-vt = $libc::NULL;
 my pointer[Vtable] $symbol-vt = $libc::NULL;
@@ -91,8 +92,14 @@ my pointer[LowLevelHash] $symbol-list = $libc::NULL;
 
 # raw-function basically means it's just like a normal C function.
 # The actual detailed semantics of this, I don't know.
+my pointer[LowLevelHash] low-level-hash-new() {
+    my pointer[LowLevelHash] $result = alloc(sizeof LowLevelHash);
+    $result.vtable = $low-level-hash-vtable;
+    low-level-hash-init($result);
+    return $result;
+}
 
-my pointer[LowLevelHash] sub low-level-hash-allocate() is raw-function {
+my void sub low-level-hash-init(pointer[LowLevelHash] $self) is raw-function {
     $self.size = 2;
     $self.tally = 0;
     $self.keys = libc::calloc($self.size, sizeof(pointer[Object]));
@@ -157,7 +164,7 @@ my pointer[Vtable] sub vtable-delegated(pointer[Vtable] $self)
     } else {
 	$child.vtable = $libc::NULL;
     }
-    $child.methods = low-level-hash-allocate();
+    $child.methods = low-level-hash-new;
     $child.parent = $self;
     return $child;
 }
@@ -209,7 +216,7 @@ my pointer[Object] sub send(pointer[Object] $self,
 }
 
 my sub metamodel-init() {
-    $symbol-list = low-level-hash-allocate();
+    $symbol-list = low-level-hash-new;
 
     $vtable-vt = vtable-delegated($libc::NULL);
     $vtable-vt.vtable = $vtable-vt;
