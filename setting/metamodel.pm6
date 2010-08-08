@@ -62,7 +62,7 @@ class LowLevelHash is raw-struct {
     has pointer[pointer[Object]] $.values;
 }
 
-my void sub low-level-hash-init(pointer[LowLevelHash] $self) is raw-function {
+my pointer[LowLevelHash] sub low-level-hash-allocate() is raw-function {
     $self.size = 2;
     $self.tally = 0;
     $self.keys = libc::calloc($self.size, sizeof(pointer[Object]));
@@ -103,7 +103,7 @@ my pointer[Object] sub low-level-hash-get(pointer[LowLevelHash] $self,
 # For raw-structs, inheritance just means sticking the parent's members
 # at the front of it.
 class Vtable is raw-struct is Object {
-    has LowLevelHash $.methods;
+    has pointer[LowLevelHash] $.methods;
     has pointer[Vtable] $.parent;
 }
 
@@ -122,7 +122,7 @@ my pointer[Object] $lookup-symbol = $libc::NULL;
 my pointer[Object] $intern-symbol = $libc::NULL;
 
 my pointer[Object] $symbol = $libc::NULL;
-my LowLevelHash $symbol-list = $libc::NULL;
+my pointer[LowLevelHash] $symbol-list = $libc::NULL;
 
 # raw-function basically means it's just like a normal C function.
 # The actual detailed semantics of this, I don't know.
@@ -153,7 +153,7 @@ my pointer[Vtable] sub vtable-delegated(pointer[Vtable] $self)
     } else {
 	$child.vtable = $libc::NULL;
     }
-    low-level-hash-init(address-of $child.methods);
+    $child.methods = low-level-hash-allocate();
     $child.parent = $self;
     return $child;
 }
@@ -162,7 +162,7 @@ my pointer[Object] sub $vtable-add-method(pointer[Vtable] $self,
 				       pointer[Object] $key,
 				       pointer[Object] $method)
   is raw-function {
-    low-level-hash-set(address-of($self.methods), $key, $method);
+    low-level-hash-set($self.methods, $key, $method);
     return $method;
 }
 
@@ -170,7 +170,7 @@ my pointer[Object] sub vtable-lookup(pointer[Vtable] $self,
 				     pointer[Object] $key)
   is raw-function {
     my pointer[Object] $result = 
-      low-level-hash-get(address-of($self.methods), $key);
+      low-level-hash-get($self.methods, $key);
     return $result if $result;
     libc::fprintf($libc::stderr, "lookup failed \%p \%s\n", $key.string);
     return $libc::NULL;
@@ -205,7 +205,8 @@ my pointer[Object] sub send(pointer[Object] $self,
 }
 
 my sub metamodel-init() {
-    low-level-hash-init(address-of $symbol-list);
+    $symbol-list = low-level-hash-allocate();
+
     $vtable-vt = vtable-delegated($libc::NULL);
     $vtable-vt.vtable = $vtable-vt;
 
