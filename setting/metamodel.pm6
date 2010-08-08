@@ -216,6 +216,9 @@ my pointer[Object] sub send(pointer[Object] $self,
 }
 
 my sub metamodel-init() {
+    $low-level-hash-vt = vtable-delegated($libc::NULL);
+    $low-level-hash-vt.vtable.methods.vtable = $low-level-hash-vt;
+    $low-level-hash-vt.vtable.attributes.vtable = $low-level-hash-vt;
     $symbol-list = low-level-hash-new;
 
     $vtable-vt = vtable-delegated($libc::NULL);
@@ -224,6 +227,9 @@ my sub metamodel-init() {
     $object-vt = vtable-delegated($libc::NULL);
     $object-vt.vtable = $vtable-vt;
     $vtable-vt.parent = $object-vt;
+
+    $low-level-hash-vt.parent = $object-vt;
+    $low-level-hash-vt.vtable = $vtable-vt;
 
     $symbol-vt = vtable-delegated($object-vt);
 
