@@ -92,6 +92,12 @@ my pointer[Object] $intern-symbol = $libc::NULL;
 my pointer[Object] $get-symbol = $libc::NULL;
 my pointer[Object] $set-symbol = $libc::NULL;
 
+my pointer[Object] $vtable-symbol = $libc::NULL;
+my pointer[Object] $methods-symbol = $libc::NULL;
+my pointer[Object] $attributes-symbol = $libc::NULL;
+my pointer[Object] $parent-symbol = $libc::NULL;
+my pointer[Object] $string-symbol = $libc::NULL;
+
 my pointer[Object] $symbol = $libc::NULL;
 my pointer[LowLevelHash] $symbol-list = $libc::NULL;
 
