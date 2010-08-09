@@ -81,6 +81,7 @@ my pointer[Vtable] $vtable-vt = $libc::NULL;
 my pointer[Vtable] $object-vt = $libc::NULL;
 my pointer[Vtable] $symbol-vt = $libc::NULL;
 
+my pointer[Object] $add-attribute-symbol = $libc::NULL;
 my pointer[Object] $get-attribute-symbol = $libc::NULL;
 my pointer[Object] $set-attribute-symbol = $libc::NULL;
 my pointer[Object] $add-method-symbol = $libc::NULL;
@@ -139,6 +140,14 @@ my pointer[Object] sub low-level-hash-get(pointer[LowLevelHash] $self,
 	}
     }
     return $libc::NULL;
+}
+
+my pointer[Object] sub vtable-add-attribute(pointer[Vtable] $self,
+                                            pointer[Object] $key,
+                                            size_t $offset)
+  is raw-function {
+    low-level-hash-set($self, $key, $offset);
+    return $key;
 }
 
 my pointer[Object] sub object-get-attribute(pointer[Object] $self,
@@ -273,6 +282,9 @@ my sub metamodel-init() {
 
     $set-symbol = send $symbol, $intern-symbol, "set";
     send $low-level-hash-vt, $add-method-symbol, $set-symbol, &low-level-hash-set;
+
+    $add-attribute-symbol = send $symbol, $intern-symbol, "add-attribute";
+    send $vtable-vt, $add-method-symbol, $add-attribute-symbol, &vtable-add-attribute;
 
     $get-attribute-symbol = send $symbol, $intern-symbol, "get-attribute";
     send $object-vt, $add-method-symbol, $get-attribute-symbol, &object-get-attribute;
