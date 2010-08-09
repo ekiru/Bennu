@@ -217,6 +217,7 @@ my pointer[Object] sub vtable-lookup(pointer[Vtable] $self,
     my pointer[Object] $result = 
       low-level-hash-get($self.methods, $key);
     return $result if $result;
+    return send($self.parent, $lookup-symbol, $key) if $self.parent;
     libc::fprintf($libc::stderr, "lookup failed \%p \%s\n", $key.string);
     return $libc::NULL;
 }
