@@ -86,6 +86,8 @@ my pointer[Object] $allocate-symbol = $libc::NULL;
 my pointer[Object] $delegated-symbol = $libc::NULL;
 my pointer[Object] $lookup-symbol = $libc::NULL;
 my pointer[Object] $intern-symbol = $libc::NULL;
+my pointer[Object] $get-symbol = $libc::NULL;
+my pointer[Object] $set-symbol = $libc::NULL;
 
 my pointer[Object] $symbol = $libc::NULL;
 my pointer[LowLevelHash] $symbol-list = $libc::NULL;
@@ -248,4 +250,10 @@ my sub metamodel-init() {
 
     $delegated-symbol = send $symbol, $intern-symbol, "delegated";
     send $vtable-vt, $add-method-symbol, $delegated-symbol, &vtable-delegated;
+
+    $get-symbol = send $symbol, $intern-symbol, "get";
+    send $low-level-hash-vt, $add-method-symbol, $get-symbol, &low-level-hash-get;
+
+    $set-symbol = send $symbol, $intern-symbol, "set";
+    send $low-level-hash-vt, $add-method-symbol, $set-symbol, &low-level-hash-set;
 }
