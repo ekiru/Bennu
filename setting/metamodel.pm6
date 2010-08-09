@@ -81,6 +81,8 @@ my pointer[Vtable] $vtable-vt = $libc::NULL;
 my pointer[Vtable] $object-vt = $libc::NULL;
 my pointer[Vtable] $symbol-vt = $libc::NULL;
 
+my pointer[Object] $get-attribute-symbol = $libc::NULL;
+my pointer[Object] $set-attribute-symbol = $libc::NULL;
 my pointer[Object] $add-method-symbol = $libc::NULL;
 my pointer[Object] $allocate-symbol = $libc::NULL;
 my pointer[Object] $delegated-symbol = $libc::NULL;
@@ -137,6 +139,20 @@ my pointer[Object] sub low-level-hash-get(pointer[LowLevelHash] $self,
 	}
     }
     return $libc::NULL;
+}
+
+my pointer[Object] sub object-get-attribute(pointer[Object] $self,
+                                            pointer[Object] $key)
+  is raw-function {
+    my libc::size_t $offset = low-level-hash-get $self.vtable.attributes, $key;
+    return deref $self + $offset;
+}
+
+my pointer[Object] sub object-set-attribute(pointer[Object] $self,
+                                            pointer[Object] $key,
+                                            pointer[Object] $value) {
+    my libc::size_t $offset = low-level-hash-get $self.vtable.attributes, $key;
+    return deref($self + $offset) = $value;
 }
 
 my pointer[void] sub alloc(libc::size_t $size) is raw-function {
@@ -256,4 +272,10 @@ my sub metamodel-init() {
 
     $set-symbol = send $symbol, $intern-symbol, "set";
     send $low-level-hash-vt, $add-method-symbol, $set-symbol, &low-level-hash-set;
+
+    $get-attribute-symbol = send $symbol, $intern-symbol, "get-attribute";
+    send $object-vt, $add-method-symbol, $get-attribute-symbol, &object-get-attribute;
+
+    $set-attribute-symbol = send $symbol, $intern-symbol, "set-attribute";
+    send $object-vt, $add-method-symbol, $set-attribute-symbol, &object-set-attribute;   
 }
