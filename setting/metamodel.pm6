@@ -171,7 +171,7 @@ my pointer[Vtable] sub vtable-delegated(pointer[Vtable] $self)
     return $child;
 }
 
-my pointer[Object] sub $vtable-add-method(pointer[Vtable] $self,
+my pointer[Object] sub vtable-add-method(pointer[Vtable] $self,
 				       pointer[Object] $key,
 				       pointer[Object] $method)
   is raw-function {
