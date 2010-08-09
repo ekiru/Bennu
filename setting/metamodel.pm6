@@ -150,16 +150,27 @@ my pointer[Object] sub low-level-hash-get(pointer[LowLevelHash] $self,
 
 my pointer[Object] sub vtable-add-attribute(pointer[Vtable] $self,
                                             pointer[Object] $key,
-                                            size_t $offset)
+                                            int $offset)
   is raw-function {
-    low-level-hash-set($self, $key, $offset);
+    # Offsets are incremented by one to distinguish 0 from missing keys.
+    low-level-hash-set($self, $key, $offset + 1);
     return $key;
+}
+
+my int sub vtable-get-attribute-offset(pointer[Vtable] $self,
+                                       pointer[Object] $key) {
+    my int $offset = low-level-hash-get $self.attributes, $key;
+    return $offset - 1 if $offset;
+    return object-get-attribute-offset $self.parent, $key if $self.parent;
+    libc::fprintf($libc::stderr, "lookup failed \%p \%s\n", $self, $key.string);
+    return -1;
 }
 
 my pointer[Object] sub object-get-attribute(pointer[Object] $self,
                                             pointer[Object] $key)
   is raw-function {
-    my libc::size_t $offset = low-level-hash-get $self.vtable.attributes, $key;
+    my int $offset = vtable-get-attribute-offset $self.vtable, $key;
+    return $libc::NULL if $offset == -1; # Need better error strategy.
     return deref $self + $offset;
 }
 
@@ -167,7 +178,9 @@ my pointer[Object] sub object-set-attribute(pointer[Object] $self,
                                             pointer[Object] $key,
                                             pointer[Object] $value)
   is raw-function {
-    my libc::size_t $offset = low-level-hash-get $self.vtable.attributes, $key;
+    my int $offset = vtable-get-attribute-offset $self.vtable, $key;
+    return $libc::NULL = $value
+      if $offset == -1; # segfaults are a very visible error condition.
     return deref($self + $offset) = $value;
 }
 
