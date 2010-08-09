@@ -244,7 +244,7 @@ my pointer[Object] sub send(pointer[Object] $self,
 			    pointer[Object] $message,
 			    pointer[Object] *@args)
   is raw-function {
-    return ($message == $lookup-symbol
+    return (($message == $lookup-symbol && $self.vtable == $vtable-vt)
 	    ?? vtable-lookup($self, $message)
 	    !! send($self, $lookup-symbol, $msg))($self, |@args);
 }
