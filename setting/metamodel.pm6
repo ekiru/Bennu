@@ -150,7 +150,8 @@ my pointer[Object] sub object-get-attribute(pointer[Object] $self,
 
 my pointer[Object] sub object-set-attribute(pointer[Object] $self,
                                             pointer[Object] $key,
-                                            pointer[Object] $value) {
+                                            pointer[Object] $value)
+  is raw-function {
     my libc::size_t $offset = low-level-hash-get $self.vtable.attributes, $key;
     return deref($self + $offset) = $value;
 }
