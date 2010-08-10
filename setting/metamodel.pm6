@@ -97,6 +97,7 @@ my pointer[Object] $vtable-symbol = $libc::NULL;
 my pointer[Object] $methods-symbol = $libc::NULL;
 my pointer[Object] $attributes-symbol = $libc::NULL;
 my pointer[Object] $parent-symbol = $libc::NULL;
+my pointer[Object] $size-symbol = $libc::NULL;
 my pointer[Object] $string-symbol = $libc::NULL;
 
 my pointer[Object] $symbol = $libc::NULL;
@@ -270,18 +271,33 @@ my sub metamodel-init() {
     $low-level-hash-vt = vtable-delegated($libc::NULL);
     $low-level-hash-vt.vtable.methods.vtable = $low-level-hash-vt;
     $low-level-hash-vt.vtable.attributes.vtable = $low-level-hash-vt;
-    $low-level-hash-vt.size = sizeof Object;
     $symbol-list = low-level-hash-new;
 
     $vtable-vt = vtable-delegated($libc::NULL);
     $vtable-vt.vtable = $vtable-vt;
-    $vtable-vt.size = sizeof Object;
 
     $object-vt = vtable-delegated($libc::NULL);
     $object-vt.vtable = $vtable-vt;
-    $object-vt.size = sizeof Object;
+    $object-vt.size = 0;
+
+    $vtable-symbol = symbol-intern $libc::NULL, "vtable";
+    vtable-add-attribute $object-vt, $vtable-symbol,
+      sizeof(pointer[Object]);
 
     $vtable-vt.parent = $object-vt;
+    $vtable-vt.size = $object-vt.size;
+    $methods-symbol = symbol-intern $libc::NULL, "methods";
+    vtable-add-attribute $vtable-vt, $methods-symbol,
+      sizeof(pointer[LowLevelHash]);
+    $attributes-symbol = symbol-intern $libc::NULL, "attributes";
+    vtable-add-attribute $vtable-vt, $attributes-symbol,
+      sizeof(pointer[LowLevelHash]);
+    $parent-symbol = symbol-intern $libc::NULL, "parent";
+    vtable-add-attribute $vtable-vt, $parent-symbol,
+      sizeof(pointer[Vtable]);
+    $size-symbol = symbol-intern $libc::NULL, "size";
+    vtable-add-attribute $vtable-vt, $size-symbol,
+      sizeof(libc::size_t);
 
     $low-level-hash-vt.parent = $object-vt;
     $low-level-hash-vt.vtable = $vtable-vt;
