@@ -151,10 +151,11 @@ my pointer[Object] sub low-level-hash-get(pointer[LowLevelHash] $self,
 
 my pointer[Object] sub vtable-add-attribute(pointer[Vtable] $self,
                                             pointer[Object] $key,
-                                            int $offset)
+                                            libc::size_t $size)
   is raw-function {
     # Offsets are incremented by one to distinguish 0 from missing keys.
-    low-level-hash-set($self, $key, $offset + 1);
+    low-level-hash-set($self, $key, $self.size + $size + 1);
+    $self.size += $size;
     return $key;
 }
 
