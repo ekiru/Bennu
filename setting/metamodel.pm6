@@ -70,6 +70,7 @@ class Vtable is raw-struct is Object {
     has pointer[LowLevelHash] $.methods;
     has pointer[LowLevelHash] $.attributes;
     has pointer[Vtable] $.parent;
+    has libc::size_t $.size;
 }
 
 class Symbol is raw-struct is Object {
@@ -213,6 +214,7 @@ my pointer[Vtable] sub vtable-delegated(pointer[Vtable] $self)
     }
     $child.methods = low-level-hash-new;
     $child.parent = $self;
+    $child.size = sizeof(pointer[Vtable]);
     return $child;
 }
 
