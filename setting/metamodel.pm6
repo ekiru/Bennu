@@ -214,7 +214,7 @@ my pointer[Vtable] sub vtable-delegated(pointer[Vtable] $self)
     }
     $child.methods = low-level-hash-new;
     $child.parent = $self;
-    $child.size = sizeof(pointer[Vtable]);
+    $child.size = $self.size if $self;
     return $child;
 }
 
