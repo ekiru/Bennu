@@ -35,6 +35,7 @@ use bootstrap::libc::stdlib <NULL calloc realloc size_t>;
 # #include <string.h>
 use bootstrap::libc::string <strcmp strdup>;
 
+class LowLevelArray { ... }
 class LowLevelHash { ... }
 
 class Vtable { ... }
@@ -55,6 +56,12 @@ subset Method where True;
 # Probably. Maybe there'll be a different op for C's ->
 class Object is raw-struct {
     has pointer[Vtable] $.vtable;
+}
+
+class LowLevelArray is raw-struct is Object {
+    has int $.size;
+    has int $.tally;
+    has pointer[pointer[Object]] $.elements;
 }
 
 class LowLevelHash is raw-struct is Object {
@@ -108,6 +115,40 @@ my pointer[LowLevelHash] $symbol-list = $libc::NULL;
 
 # raw-function basically means it's just like a normal C function.
 # The actual detailed semantics of this, I don't know.
+my pointer[LowLevelArray] low-level-array-new() is raw-function {
+    my pointer[LowLevelArray] $result = alloc(sizeof LowLevelArray);
+    $result.vtable = $low-level-array-vtable;
+    low-level-array-init($result);
+    return $result;
+}
+
+my void sub low-level-array-init(pointer[LowLevelArray] $self)
+  is raw-function {
+    $self.size = 2;
+    $self.tally = 0;
+    $self.elements = libc::calloc($self.size, sizeof(pointer[Object]));
+}
+
+my pointer[Object] sub low-level-array-get(pointer[LowLevelArray] $self,
+                                           int $index)
+  is raw-function {
+    return $libc::NULL if $self.tally > $index;
+    return $self.elements[$index];
+}
+
+my pointer[Object] sub low-level-array-set(pointer[LowLevelArray] $self,
+                                           int $index,
+                                           pointer[Object] $value)
+  is raw-function {
+    if $index + 1 > $self.size {
+        $self.size *= 2;
+        $self.elements = libc::realloc($self.elements,
+                                       sizeof(pointer[Object]) * $self.size);
+    }
+    return $self.elements[$index] = $value;
+}
+                                           
+
 my pointer[LowLevelHash] low-level-hash-new() {
     my pointer[LowLevelHash] $result = alloc(sizeof LowLevelHash);
     $result.vtable = $low-level-hash-vtable;
