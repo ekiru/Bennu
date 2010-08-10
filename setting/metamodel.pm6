@@ -269,13 +269,17 @@ my sub metamodel-init() {
     $low-level-hash-vt = vtable-delegated($libc::NULL);
     $low-level-hash-vt.vtable.methods.vtable = $low-level-hash-vt;
     $low-level-hash-vt.vtable.attributes.vtable = $low-level-hash-vt;
+    $low-level-hash-vt.size = sizeof Object;
     $symbol-list = low-level-hash-new;
 
     $vtable-vt = vtable-delegated($libc::NULL);
     $vtable-vt.vtable = $vtable-vt;
+    $vtable-vt.size = sizeof Object;
 
     $object-vt = vtable-delegated($libc::NULL);
     $object-vt.vtable = $vtable-vt;
+    $object-vt.size = sizeof Object;
+
     $vtable-vt.parent = $object-vt;
 
     $low-level-hash-vt.parent = $object-vt;
