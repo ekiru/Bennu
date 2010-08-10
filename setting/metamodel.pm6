@@ -319,6 +319,9 @@ my sub metamodel-init() {
       sizeof(pointer[pointer[Object]]);
 
     $symbol-vt = vtable-delegated($object-vt);
+    $string-symbol = symbol-intern, $libc::NULL, "string";
+    vtable-add-attribute $string-vt, $string-symbol,
+      sizeof(pointer[char]);
 
     $lookup-symbol = symbol-intern $libc::NULL, "lookup";
     vtable-add-method $vtable-vt, $lookup-symbol, &vtable-lookup;
