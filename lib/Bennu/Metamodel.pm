@@ -17,33 +17,35 @@ class Bennu::Attribute { ... }
 class Bennu::Method { ... }
 
 class Bennu::Mu is rw {
-    has Bennu::ClassHOW $._HOW;
-    has Bennu::ClassWHAT $._WHAT;
+    has Bennu::REPR $._REPR;
+    # Fake attributes are stored in the _REPR.
+    # has Bennu::ClassHOW $._HOW;
+    # has Bennu::ClassWHAT $._WHAT;
 }
 
-class Bennu::ClassHOW is Bennu::Mu is rw {
-    has Str $.name;
-    has Bennu::Method @.methods;
-    has Bennu::Attribute @.attributes;
-    has Bennu::ClassHOW @.parents;
-    has Bennu::ClassREPR $.REPR;
+class Bennu::ClassHOW is Bennu::Mu {
+    # has Str $.name;
+    # has Bennu::Method @.methods;
+    # has Bennu::Attribute @.attributes;
+    # has Bennu::ClassHOW @.parents;
+    # has Bennu::ClassREPR $.REPR;
 }
 
-class Bennu::ClassREPR is Bennu::Mu is rw {
-    has Int %.offsets{Str};
+class Bennu::ClassREPR is Bennu::Mu {
+    # has Int %.offsets{Str};
 }
 
-class Bennu::ClassWHAT is Bennu::Mu is rw {
+class Bennu::ClassWHAT is Bennu::Mu {
 
 }
 
-class Bennu::Attribute is Bennu::Mu is rw {
-    has Str $.name;
+class Bennu::Attribute is Bennu::Mu {
+    # has Str $.name;
 }
 
-class Bennu::Method is Bennu::Mu is rw {
-    has Str $.name;
-    has &.code;
+class Bennu::Method is Bennu::Mu {
+    # has Str $.name;
+    # has &.code;
 }
 
 module Bennu;
@@ -66,18 +68,18 @@ our Bennu::ClassHOW $HOWMethod;
 
 our Bennu::ClassHOW sub ClassHOW-create (Str $name) {
     my Bennu::ClassHOW $classHOW .= new;
-    $classHOW.name = $name;
-    $classHOW._HOW = $HOWClassHOW;
+    $classHOW._REPR<name> = $name;
+    $classHOW._REPR<_HOW> = $HOWClassHOW;
     $classHOW;
 }
 
 our sub ClassHOW-add-parent (Bennu::ClassHOW $self, Bennu::ClassHOW $parent) {
-    $self.parents.push($parent);
+    $self._REPR<parents>.push($parent);
 }
 
 our sub metamodel-init () {
     $HOWClassHOW = ClassHOW-create('ClassHOW');
-    $HOWClassHOW._HOW = $HOWClassHOW;
+    $HOWClassHOW._REPR<_HOW> = $HOWClassHOW;
 
     $HOWMu = ClassHOW-create('Mu');
     classHOW-add-parent($HOWClassHOW, $HOWMu);
