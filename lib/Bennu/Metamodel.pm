@@ -56,6 +56,14 @@ our Bennu::ClassWHAT $ClassWHAT;
 our Bennu::ClassWHAT $Attribute;
 our Bennu::ClassWHAT $Method;
 
+# ClassHOW objects for the metamodel types
+our Bennu::ClassHOW $HOWMu;
+our Bennu::ClassHOW $HOWClassHOW;
+our Bennu::ClassHOW $HOWClassREPR;
+our Bennu::ClassHOW $HOWClassWHAT;
+our Bennu::ClassHOW $HOWAttribute;
+our Bennu::ClassHOW $HOWMethod;
+
 our sub metamodel-init () {
     ...
 }
