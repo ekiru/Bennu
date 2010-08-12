@@ -70,11 +70,20 @@ our sub set-attribute (Bennu::Mu $self, Str $attr, $value) {
     $self._REPR.storage{$attr} = $value;
 }
 
-our Bennu::ClassHOW sub ClassHOW-create (Str $name) {
-    my $classHOW = Bennu::Mu.new;
-    set-attribute $classHOW, 'ClassHOW::$!name', $name;
-    set-attribute $classHOW, 'Mu::!HOW', $HOWClassHOW;
-    $classHOW;
+our Bennu::Mu sub Mu-new ($HOW, $WHAT) {
+    my Bennu::Mu $self .= new;
+    set-attribute $self, 'Mu::$!HOW', $HOW;
+    set-attribute $self, 'Mu::$!WHAT', $WHAT;
+    $self;
+}
+
+our sub ClassHOW-new (Str $name) {
+    my $self = Mu-new $HOWClassHOW, $ClassHOW;
+    set-attribute $self, 'ClassHOW::$!name', $name;
+    set-attribute $self, 'ClassHOW::@!methods', [];
+    set-attribute $self, 'ClassHOW::@!attributes', [];
+    set-attribute $self, 'ClassHOW::@!parents', [];
+    $self;
 }
 
 our sub ClassHOW-add-parent (Bennu::Mu $self, Bennu::Mu $parent) {
@@ -82,10 +91,10 @@ our sub ClassHOW-add-parent (Bennu::Mu $self, Bennu::Mu $parent) {
 }
 
 our sub metamodel-init () {
-    $HOWClassHOW = ClassHOW-create('ClassHOW');
+    $HOWClassHOW = ClassHOW-new('ClassHOW');
     set-attribute $HOWClassHOW, 'Mu::$!HOW', $HOWClassHOW;
 
-    $HOWMu = ClassHOW-create('Mu');
+    $HOWMu = ClassHOW-new('Mu');
     classHOW-add-parent($HOWClassHOW, $HOWMu);
     ...
 }
