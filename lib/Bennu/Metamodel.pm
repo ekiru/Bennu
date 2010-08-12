@@ -18,6 +18,7 @@ class Bennu::Method { ... }
 
 class Bennu::Mu is rw {
     has Bennu::ClassHOW $._HOW;
+    has Bennu::ClassWHAT $._WHAT;
 }
 
 class Bennu::ClassHOW is Bennu::Mu is rw {
