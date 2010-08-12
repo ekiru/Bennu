@@ -11,60 +11,56 @@ use v6;
 
 class Bennu::Mu { ... }
 class Bennu::REPR { ... }
-class Bennu::ClassHOW { ... }
-class Bennu::ClassWHAT { ... }
-class Bennu::Attribute { ... }
-class Bennu::Method { ... }
 
 class Bennu::Mu is rw {
     has Bennu::REPR $._REPR .= new;
     # Fake attributes are stored in the _REPR.
-    # has Bennu::ClassHOW $._HOW;
-    # has Bennu::ClassWHAT $._WHAT;
+    # has ClassHOW $.HOW;
+    # has ClassWHAT $.WHAT;
 }
 
 class Bennu::REPR {
     has %.storage;
 }
 
-class Bennu::ClassHOW is Bennu::Mu {
+# Metamodel-level classes.
+# class ClassHOW is Mu {
     # has Str $.name;
-    # has Bennu::Method @.methods;
-    # has Bennu::Attribute @.attributes;
-    # has Bennu::ClassHOW @.parents;
-    # has Bennu::ClassREPR $.REPR;
-}
+    # has Method @.methods;
+    # has Attribute @.attributes;
+    # has ClassHOW @.parents;
+# }
 
-class Bennu::ClassWHAT is Bennu::Mu {
+# class ClassWHAT is Mu {
+#
+# }
 
-}
-
-class Bennu::Attribute is Bennu::Mu {
+# class Attribute is Mu {
     # has Str $.name;
-}
+# }
 
-class Bennu::Method is Bennu::Mu {
+# class Method is Mu {
     # has Str $.name;
     # has &.code;
-}
+# }
 
 module Bennu;
 
 # Type objects for the metamodel types.
-our Bennu::ClassWHAT $Mu;
-our Bennu::ClassWHAT $REPR;
-our Bennu::ClassWHAT $ClassHOW;
-our Bennu::ClassWHAT $ClassWHAT;
-our Bennu::ClassWHAT $Attribute;
-our Bennu::ClassWHAT $Method;
+our Bennu::Mu $Mu;
+our Bennu::Mu $REPR;
+our Bennu::Mu $ClassHOW;
+our Bennu::Mu $ClassWHAT;
+our Bennu::Mu $Attribute;
+our Bennu::Mu $Method;
 
 # ClassHOW objects for the metamodel types
-our Bennu::ClassHOW $HOWMu;
-our Bennu::ClassHOW $HOWREPR;
-our Bennu::ClassHOW $HOWClassHOW;
-our Bennu::ClassHOW $HOWClassWHAT;
-our Bennu::ClassHOW $HOWAttribute;
-our Bennu::ClassHOW $HOWMethod;
+our Bennu::Mu $HOWMu;
+our Bennu::Mu $HOWREPR;
+our Bennu::Mu $HOWClassHOW;
+our Bennu::Mu $HOWClassWHAT;
+our Bennu::Mu $HOWAttribute;
+our Bennu::Mu $HOWMethod;
 
 our sub get-attribute (Bennu::Mu $self, Str $attr) {
     $self._REPR.storage{$attr};
@@ -75,13 +71,13 @@ our sub set-attribute (Bennu::Mu $self, Str $attr, $value) {
 }
 
 our Bennu::ClassHOW sub ClassHOW-create (Str $name) {
-    my Bennu::ClassHOW $classHOW .= new;
+    my $classHOW .= new;
     set-attribute $classHOW, 'ClassHOW::$!name', $name;
     set-attribute $classHOW, 'Mu::!HOW', $HOWClassHOW;
     $classHOW;
 }
 
-our sub ClassHOW-add-parent (Bennu::ClassHOW $self, Bennu::ClassHOW $parent) {
+our sub ClassHOW-add-parent (Bennu::Mu $self, Bennu::Mu $parent) {
     get-attribute($self, 'ClassHOW::@!parents').push($parent);
 }
 
