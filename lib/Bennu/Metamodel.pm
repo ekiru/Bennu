@@ -64,6 +64,22 @@ our Bennu::ClassHOW $HOWClassWHAT;
 our Bennu::ClassHOW $HOWAttribute;
 our Bennu::ClassHOW $HOWMethod;
 
+our Bennu::ClassHOW sub ClassHOW-create (Str $name) {
+    my Bennu::ClassHOW $classHOW .= new;
+    $classHOW.name = $name;
+    $classHOW._HOW = $HOWClassHOW;
+    $classHOW;
+}
+
+our sub ClassHOW-add-parent (Bennu::ClassHOW $self, Bennu::ClassHOW $parent) {
+    $self.parents.push($parent);
+}
+
 our sub metamodel-init () {
+    $HOWClassHOW = ClassHOW-create('ClassHOW');
+    $HOWClassHOW._HOW = $HOWClassHOW;
+
+    $HOWMu = ClassHOW-create('Mu');
+    classHOW-add-parent($HOWClassHOW, $HOWMu);
     ...
 }
