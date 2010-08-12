@@ -10,8 +10,8 @@ use v6;
 # bootstrappable. 
 
 class Bennu::Mu { ... }
+class Bennu::REPR { ... }
 class Bennu::ClassHOW { ... }
-class Bennu::ClassREPR { ... }
 class Bennu::ClassWHAT { ... }
 class Bennu::Attribute { ... }
 class Bennu::Method { ... }
@@ -31,8 +31,8 @@ class Bennu::ClassHOW is Bennu::Mu {
     # has Bennu::ClassREPR $.REPR;
 }
 
-class Bennu::ClassREPR is Bennu::Mu {
-    # has Int %.offsets{Str};
+class Bennu::REPR is Bennu::Mu {
+
 }
 
 class Bennu::ClassWHAT is Bennu::Mu {
@@ -52,16 +52,16 @@ module Bennu;
 
 # Type objects for the metamodel types.
 our Bennu::ClassWHAT $Mu;
+our Bennu::ClassWHAT $REPR;
 our Bennu::ClassWHAT $ClassHOW;
-our Bennu::ClassWHAT $ClassREPR;
 our Bennu::ClassWHAT $ClassWHAT;
 our Bennu::ClassWHAT $Attribute;
 our Bennu::ClassWHAT $Method;
 
 # ClassHOW objects for the metamodel types
 our Bennu::ClassHOW $HOWMu;
+our Bennu::ClassHOW $HOWREPR;
 our Bennu::ClassHOW $HOWClassHOW;
-our Bennu::ClassHOW $HOWClassREPR;
 our Bennu::ClassHOW $HOWClassWHAT;
 our Bennu::ClassHOW $HOWAttribute;
 our Bennu::ClassHOW $HOWMethod;
