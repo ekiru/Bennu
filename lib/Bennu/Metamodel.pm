@@ -21,6 +21,7 @@ class Bennu::Mu {
 }
 
 class Bennu::ClassHOW is Bennu::Mu {
+    has Str $.name;
     has Bennu::Method @.methods;
     has Bennu::Attribute @.attributes;
     has Bennu::ClassHOW @.parents;
