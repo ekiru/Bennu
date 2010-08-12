@@ -16,11 +16,11 @@ class Bennu::ClassWHAT { ... }
 class Bennu::Attribute { ... }
 class Bennu::Method { ... }
 
-class Bennu::Mu {
+class Bennu::Mu is rw {
     has Bennu::ClassHOW $.HOW;
 }
 
-class Bennu::ClassHOW is Bennu::Mu {
+class Bennu::ClassHOW is Bennu::Mu is rw {
     has Str $.name;
     has Bennu::Method @.methods;
     has Bennu::Attribute @.attributes;
@@ -28,19 +28,19 @@ class Bennu::ClassHOW is Bennu::Mu {
     has Bennu::ClassREPR $.REPR;
 }
 
-class Bennu::ClassREPR is Bennu::Mu {
+class Bennu::ClassREPR is Bennu::Mu is rw {
     has Int %.offsets{Str};
 }
 
-class Bennu::ClassWHAT is Bennu::Mu {
+class Bennu::ClassWHAT is Bennu::Mu is rw {
 
 }
 
-class Bennu::Attribute is Bennu::Mu {
+class Bennu::Attribute is Bennu::Mu is rw {
     has Str $.name;
 }
 
-class Bennu::Method is Bennu::Mu {
+class Bennu::Method is Bennu::Mu is rw {
     has Str $.name;
     has &.code;
 }
