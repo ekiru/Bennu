@@ -31,10 +31,6 @@ class Bennu::REPR {
     # has ClassHOW @.parents;
 # }
 
-# class ClassWHAT is Mu {
-#
-# }
-
 # class Attribute is Mu {
     # has Str $.name;
 # }
@@ -50,7 +46,6 @@ module Bennu;
 our Bennu::Mu $Mu;
 our Bennu::Mu $REPR;
 our Bennu::Mu $ClassHOW;
-our Bennu::Mu $ClassWHAT;
 our Bennu::Mu $Attribute;
 our Bennu::Mu $Method;
 
@@ -58,7 +53,6 @@ our Bennu::Mu $Method;
 our Bennu::Mu $HOWMu;
 our Bennu::Mu $HOWREPR;
 our Bennu::Mu $HOWClassHOW;
-our Bennu::Mu $HOWClassWHAT;
 our Bennu::Mu $HOWAttribute;
 our Bennu::Mu $HOWMethod;
 
@@ -90,11 +84,21 @@ our sub ClassHOW-add-parent (Bennu::Mu $self, Bennu::Mu $parent) {
     get-attribute($self, 'ClassHOW::@!parents').push($parent);
 }
 
+our sub Protoobject-new (Bennu::Mu $HOW) {
+    my $self = Mu-new $HOW, Nil;
+    set-attribute $self, 'Mu::$!WHAT', $self;
+    $self;
+}
+
 our sub metamodel-init () {
     $HOWClassHOW = ClassHOW-new('ClassHOW');
     set-attribute $HOWClassHOW, 'Mu::$!HOW', $HOWClassHOW;
 
+    $ClassHOW = Protoobject-new $HOWClassHOW;
+    set-attribute $HOWClassHOW, 'Mu::$!WHAT', $ClassHOW;
+
     $HOWMu = ClassHOW-new('Mu');
     classHOW-add-parent($HOWClassHOW, $HOWMu);
+    $Mu = Protoobject-new($HOWMu);
     ...
 }
