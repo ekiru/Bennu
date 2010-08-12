@@ -71,7 +71,7 @@ our sub set-attribute (Bennu::Mu $self, Str $attr, $value) {
 }
 
 our Bennu::ClassHOW sub ClassHOW-create (Str $name) {
-    my $classHOW .= new;
+    my $classHOW = Bennu::Mu.new;
     set-attribute $classHOW, 'ClassHOW::$!name', $name;
     set-attribute $classHOW, 'Mu::!HOW', $HOWClassHOW;
     $classHOW;
