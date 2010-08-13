@@ -104,6 +104,18 @@ our sub ClassHOW-add-method (Bennu::Mu $self, Bennu::Mu $method) {
     get-attribute($self, 'ClassHOW::@!methods').push($method);
 }
 
+# Wrong MRO currently but we can fix that later.
+our sub ClassHOW-find-method (Bennu::Mu $self, Str $name) {
+    for get-attribute($self, 'ClassHOW::@!methods') -> $method {
+        return $method if $method.name eq $name;
+    }
+    for get-attribute($self, 'ClassHOW::@!parents') -> $parent {
+        my $method = send $parent, 'find-method', $name;
+        return $method if $method;
+    }
+    die "Method $name not found in class {get-attribute $self, 'ClassHOW::$!name'}";
+}
+
 our sub Protoobject-new (Bennu::Mu $WHAT, Bennu::Mu $HOW) {
     my $self = Mu-new $WHAT, $HOWClassHOW;
     set-attribute $self, 'Mu::$!WHAT', $self;
@@ -123,6 +135,18 @@ our sub Method-new (Bennu::Mu $WHAT, Str $name, &code) {
     $self;
 }
 
+our sub send (Bennu::Mu $self, Str $method-name, *@args) {
+    say 'in send';
+    my $method;
+    if $method-name eq 'find-method'
+      && Mu-HOW($self) === $HOWClassHOW {
+        $method = ClassHOW-find-method $self, $method;
+    } else {
+        $method = send Mu-HOW($self), 'find-method', $method-name;
+    }
+    get-attribute($method, 'Method::&!code').($self, |@args);
+}
+
 our sub metamodel-init () {
     $HOWClassHOW = ClassHOW-new $ClassHOW, 'ClassHOW';
     set-attribute $HOWClassHOW, 'Mu::$!HOW', $HOWClassHOW;
@@ -138,22 +162,23 @@ our sub metamodel-init () {
     ClassHOW-add-parent $HOWAttribute, $HOWMu;
     $Attribute = Protoobject-new $Attribute, $HOWAttribute;
 
-    add-attribute $HOWMu, Attribute-new($Attribute, 'Mu::$!HOW');
-    add-attribute $HOWMu, Attribute-new($Attribute, 'Mu::$!WHAT');
-    add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::$!name');
-    add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!methods');
-    add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!attributes');
-    add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!parents');
-    add-attribute $HOWAttribute, Attribute-new($Attribute, 'Attribute::$!name');
+    ClassHOW-add-attribute $HOWMu, Attribute-new($Attribute, 'Mu::$!HOW');
+    ClassHOW-add-attribute $HOWMu, Attribute-new($Attribute, 'Mu::$!WHAT');
+    ClassHOW-add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::$!name');
+    ClassHOW-add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!methods');
+    ClassHOW-add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!attributes');
+    ClassHOW-add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!parents');
+    ClassHOW-add-attribute $HOWAttribute, Attribute-new($Attribute, 'Attribute::$!name');
 
     $HOWMethod = ClassHOW-new $ClassHOW, 'Method';
     ClassHOW-add-parent $HOWMethod, $HOWMu;
     $Method = Protoobject-new $Method, $HOWMethod;
-    add-attribute $HOWMethod, Attribute-new($Attribute, 'Method::$!name');
-    add-attribute $HOWMethod, Attribute-new($Attribute, 'Method::&!code');
+    ClassHOW-add-attribute $HOWMethod, Attribute-new($Attribute, 'Method::$!name');
+    ClassHOW-add-attribute $HOWMethod, Attribute-new($Attribute, 'Method::&!code');
 
-    add-method $HOWMu, Method-new($Method, 'HOW', &Mu-HOW);
-    add-method $HOWMu, Method-new($Method, 'WHAT', &Mu-WHAT);
+    ClassHOW-add-method $HOWMu, Method-new($Method, 'HOW', &Mu-HOW);
+    ClassHOW-add-method $HOWMu, Method-new($Method, 'WHAT', &Mu-WHAT);
+    ClassHOW-add-method $HOWClassHOW, Method-new($Method, 'add-method', &ClassHOW-add-method);
 }
 
 metamodel-init();
