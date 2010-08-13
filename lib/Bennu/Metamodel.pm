@@ -114,3 +114,5 @@ our sub metamodel-init () {
     $Attribute = Protoobject-new $HOWAttribute;
     ...
 }
+
+metamodel-init();
