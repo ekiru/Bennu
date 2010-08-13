@@ -68,15 +68,15 @@ our sub set-attribute (Bennu::Mu $self, Str $attr, $value) {
     $self._REPR.storage{$attr} = $value;
 }
 
-our Bennu::Mu sub Mu-new ($HOW, $WHAT) {
+our Bennu::Mu sub Mu-new (Bennu::Mu $WHAT, Bennu::Mu $HOW) {
     my Bennu::Mu $self .= new;
     set-attribute $self, 'Mu::$!HOW', $HOW;
     set-attribute $self, 'Mu::$!WHAT', $WHAT;
     $self;
 }
 
-our sub ClassHOW-new (Str $name) {
-    my $self = Mu-new $HOWClassHOW, $ClassHOW;
+our sub ClassHOW-new (Bennu::Mu $WHAT, Str $name) {
+    my $self = Mu-new $ClassHOW, $HOWClassHOW;
     set-attribute $self, 'ClassHOW::$!name', $name;
     set-attribute $self, 'ClassHOW::@!methods', [];
     set-attribute $self, 'ClassHOW::@!attributes', [];
@@ -92,32 +92,32 @@ our sub ClassHOW-add-attribute (Bennu::Mu $self, Bennu::Mu $attribute) {
     get-attribute($self, 'ClassHOW::@!attributes').push($attribute);
 }
 
-our sub Protoobject-new (Bennu::Mu $HOW) {
-    my $self = Mu-new $HOW, Nil;
+our sub Protoobject-new (Bennu::Mu $WHAT, Bennu::Mu $HOW) {
+    my $self = Mu-new $WHAT, $HOWClassHOW;
     set-attribute $self, 'Mu::$!WHAT', $self;
     $self;
 }
 
-our sub Attribute-new (Str $name) {
-    my $self = Mu-new $HOWAttribute, $Attribute;
+our sub Attribute-new (Bennu::Mu $WHAT, Str $name) {
+    my $self = Mu-new $Attribute, $HOWAttribute;
     set-attribute $self, 'Attribute::$!name', $name;
     $self;
 }
 
 our sub metamodel-init () {
-    $HOWClassHOW = ClassHOW-new 'ClassHOW';
+    $HOWClassHOW = ClassHOW-new $ClassHOW, 'ClassHOW';
     set-attribute $HOWClassHOW, 'Mu::$!HOW', $HOWClassHOW;
 
-    $ClassHOW = Protoobject-new $HOWClassHOW;
+    $ClassHOW = Protoobject-new $ClassHOW, $HOWClassHOW;
     set-attribute $HOWClassHOW, 'Mu::$!WHAT', $ClassHOW;
 
-    $HOWMu = ClassHOW-new 'Mu';
+    $HOWMu = ClassHOW-new $ClassHOW, 'Mu';
     ClassHOW-add-parent $HOWClassHOW, $HOWMu;
-    $Mu = Protoobject-new $HOWMu;
+    $Mu = Protoobject-new $Mu, $HOWMu;
 
-    $HOWAttribute = ClassHOW-new 'Attribute';
+    $HOWAttribute = ClassHOW-new $ClassHOW, 'Attribute';
     ClassHOW-add-parent $HOWAttribute, $HOWMu;
-    $Attribute = Protoobject-new $HOWAttribute;
+    $Attribute = Protoobject-new $Attribute, $HOWAttribute;
 
     add-attribute $HOWMu, Attribute-new('Mu::$!HOW');
     add-attribute $HOWMu, Attribute-new('Mu::$!WHAT');
