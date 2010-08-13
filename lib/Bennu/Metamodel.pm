@@ -84,10 +84,18 @@ our sub ClassHOW-add-parent (Bennu::Mu $self, Bennu::Mu $parent) {
     get-attribute($self, 'ClassHOW::@!parents').push($parent);
 }
 
+our sub ClassHOW-add-attribute (Bennu::Mu $self, Bennu::Mu $attribute) {
+    get-attribute($self, 'ClassHOW::@!attributes').push($attribute);
+}
+
 our sub Protoobject-new (Bennu::Mu $HOW) {
     my $self = Mu-new $HOW, Nil;
     set-attribute $self, 'Mu::$!WHAT', $self;
     $self;
+}
+
+our sub Attribute-new (Str $name) {
+    Mu-new $HOWAttribute, $Attribute;
 }
 
 our sub metamodel-init () {
@@ -100,5 +108,9 @@ our sub metamodel-init () {
     $HOWMu = ClassHOW-new('Mu');
     classHOW-add-parent($HOWClassHOW, $HOWMu);
     $Mu = Protoobject-new($HOWMu);
+
+    $HOWAttribute = ClassHOW-new('Attribute');
+    ClassHOW-add-parent($HOWAttribute, $HOWMu);
+    $Attribute = Protoobject-new $HOWAttribute;
     ...
 }
