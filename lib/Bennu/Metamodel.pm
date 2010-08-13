@@ -119,13 +119,13 @@ our sub metamodel-init () {
     ClassHOW-add-parent $HOWAttribute, $HOWMu;
     $Attribute = Protoobject-new $Attribute, $HOWAttribute;
 
-    add-attribute $HOWMu, Attribute-new('Mu::$!HOW');
-    add-attribute $HOWMu, Attribute-new('Mu::$!WHAT');
-    add-attribute $HOWClassHOW, Attribute-new('ClassHOW::$!name');
-    add-attribute $HOWClassHOW, Attribute-new('ClassHOW::@!methods');
-    add-attribute $HOWClassHOW, Attribute-new('ClassHOW::@!attributes');
-    add-attribute $HOWClassHOW, Attribute-new('ClassHOW::@!parents');
-    add-attribute $HOWAttribute, Attribute-new('Attribute::$!name');
+    add-attribute $HOWMu, Attribute-new($Attribute, 'Mu::$!HOW');
+    add-attribute $HOWMu, Attribute-new($Attribute, 'Mu::$!WHAT');
+    add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::$!name');
+    add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!methods');
+    add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!attributes');
+    add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!parents');
+    add-attribute $HOWAttribute, Attribute-new($Attribute, 'Attribute::$!name');
 }
 
 metamodel-init();
