@@ -12,16 +12,20 @@ use v6;
 class Bennu::Mu { ... }
 class Bennu::REPR { ... }
 
-class Bennu::Mu is rw {
-    has Bennu::REPR $._REPR .= new;
+class Bennu::Mu {
+    has Bennu::REPR $._REPR;
     # Fake attributes are stored in the _REPR.
     # has ClassHOW $.HOW;
     # has ClassWHAT $.WHAT;
+
+    submethod BUILD () {
+        $!_REPR = Bennu::REPR.new;
+    }
 }
 
 class Bennu::REPR {
     has %.storage;
-}
+};
 
 # Metamodel-level classes.
 # class ClassHOW is Mu {
@@ -112,7 +116,6 @@ our sub metamodel-init () {
     $HOWAttribute = ClassHOW-new 'Attribute';
     ClassHOW-add-parent $HOWAttribute, $HOWMu;
     $Attribute = Protoobject-new $HOWAttribute;
-    ...
 }
 
 metamodel-init();
