@@ -99,18 +99,18 @@ our sub Attribute-new (Str $name) {
 }
 
 our sub metamodel-init () {
-    $HOWClassHOW = ClassHOW-new('ClassHOW');
+    $HOWClassHOW = ClassHOW-new 'ClassHOW';
     set-attribute $HOWClassHOW, 'Mu::$!HOW', $HOWClassHOW;
 
     $ClassHOW = Protoobject-new $HOWClassHOW;
     set-attribute $HOWClassHOW, 'Mu::$!WHAT', $ClassHOW;
 
-    $HOWMu = ClassHOW-new('Mu');
-    classHOW-add-parent($HOWClassHOW, $HOWMu);
-    $Mu = Protoobject-new($HOWMu);
+    $HOWMu = ClassHOW-new 'Mu';
+    ClassHOW-add-parent $HOWClassHOW, $HOWMu;
+    $Mu = Protoobject-new $HOWMu;
 
-    $HOWAttribute = ClassHOW-new('Attribute');
-    ClassHOW-add-parent($HOWAttribute, $HOWMu);
+    $HOWAttribute = ClassHOW-new 'Attribute';
+    ClassHOW-add-parent $HOWAttribute, $HOWMu;
     $Attribute = Protoobject-new $HOWAttribute;
     ...
 }
