@@ -75,6 +75,14 @@ our Bennu::Mu sub Mu-new (Bennu::Mu $WHAT, Bennu::Mu $HOW) {
     $self;
 }
 
+our sub Mu-HOW (Bennu::Mu $self) {
+    get-attribute $self, 'Mu::$!HOW';
+}
+
+our sub Mu-WHAT (Bennu::Mu $self) {
+    get-attribute $self, 'Mu::$!WHAT';
+}
+
 our sub ClassHOW-new (Bennu::Mu $WHAT, Str $name) {
     my $self = Mu-new $ClassHOW, $HOWClassHOW;
     set-attribute $self, 'ClassHOW::$!name', $name;
@@ -92,6 +100,10 @@ our sub ClassHOW-add-attribute (Bennu::Mu $self, Bennu::Mu $attribute) {
     get-attribute($self, 'ClassHOW::@!attributes').push($attribute);
 }
 
+our sub ClassHOW-add-method (Bennu::Mu $self, Bennu::Mu $method) {
+    get-attribute($self, 'ClassHOW::@!methods').push($method);
+}
+
 our sub Protoobject-new (Bennu::Mu $WHAT, Bennu::Mu $HOW) {
     my $self = Mu-new $WHAT, $HOWClassHOW;
     set-attribute $self, 'Mu::$!WHAT', $self;
@@ -101,6 +113,13 @@ our sub Protoobject-new (Bennu::Mu $WHAT, Bennu::Mu $HOW) {
 our sub Attribute-new (Bennu::Mu $WHAT, Str $name) {
     my $self = Mu-new $Attribute, $HOWAttribute;
     set-attribute $self, 'Attribute::$!name', $name;
+    $self;
+}
+
+our sub Method-new (Bennu::Mu $WHAT, Str $name, &code) {
+    my $self = Mu-new $Method, $HOWMethod;
+    set-attribute $self, 'Method::$!name', $name;
+    set-attribute $self, 'Method::&!code', &code;
     $self;
 }
 
@@ -126,6 +145,15 @@ our sub metamodel-init () {
     add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!attributes');
     add-attribute $HOWClassHOW, Attribute-new($Attribute, 'ClassHOW::@!parents');
     add-attribute $HOWAttribute, Attribute-new($Attribute, 'Attribute::$!name');
+
+    $HOWMethod = ClassHOW-new $ClassHOW, 'Method';
+    ClassHOW-add-parent $HOWMethod, $HOWMu;
+    $Method = Protoobject-new $Method, $HOWMethod;
+    add-attribute $HOWMethod, Attribute-new($Attribute, 'Method::$!name');
+    add-attribute $HOWMethod, Attribute-new($Attribute, 'Method::&!code');
+
+    add-method $HOWMu, Method-new($Method, 'HOW', &Mu-HOW);
+    add-method $HOWMu, Method-new($Method, 'WHAT', &Mu-WHAT);
 }
 
 metamodel-init();
