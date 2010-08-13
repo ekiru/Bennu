@@ -136,7 +136,6 @@ our sub Method-new (Bennu::Mu $WHAT, Str $name, &code) {
 }
 
 our sub send (Bennu::Mu $self, Str $method-name, *@args) {
-    say 'in send';
     my $method;
     if $method-name eq 'find-method'
       && Mu-HOW($self) === $HOWClassHOW {
