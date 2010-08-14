@@ -106,18 +106,17 @@ our sub ClassHOW-add-method (Bennu::Mu $self, Bennu::Mu $method) {
 
 # Wrong MRO currently but we can fix that later.
 our sub ClassHOW-find-method (Bennu::Mu $self, Str $name) {
-    for get-attribute($self, 'ClassHOW::@!methods') -> $method {
-        return $method if $method.name eq $name;
+    for get-attribute($self, 'ClassHOW::@!methods').list -> $method {
+        return $method if get-attribute($method, 'Method::$!name') eq $name;
     }
-    for get-attribute($self, 'ClassHOW::@!parents') -> $parent {
-        my $method = send $parent, 'find-method', $name;
+    for get-attribute($self, 'ClassHOW::@!parents').list -> $parent {
+        my $method = send $parent, 'find-method', [ $name ];
         return $method if $method;
     }
-    die "Method $name not found in class {get-attribute $self, 'ClassHOW::$!name'}";
 }
 
 our sub Protoobject-new (Bennu::Mu $WHAT, Bennu::Mu $HOW) {
-    my $self = Mu-new $WHAT, $HOWClassHOW;
+    my $self = Mu-new $WHAT, $HOW;
     set-attribute $self, 'Mu::$!WHAT', $self;
     $self;
 }
@@ -135,14 +134,15 @@ our sub Method-new (Bennu::Mu $WHAT, Str $name, &code) {
     $self;
 }
 
-our sub send (Bennu::Mu $self, Str $method-name, *@args) {
-    my $method;
+our sub send (Bennu::Mu $self, Str $method-name, @args) {
     if $method-name eq 'find-method'
       && Mu-HOW($self) === $HOWClassHOW {
-        $method = ClassHOW-find-method $self, $method;
-    } else {
-        $method = send Mu-HOW($self), 'find-method', $method-name;
+        return ClassHOW-find-method $self, |@args;
     }
+    my $method = send Mu-HOW($self), 'find-method', [ $method-name ];
+    die "Method $method-name not found in class " ~
+      get-attribute(Mu-HOW($self), 'ClassHOW::$!name')
+        unless $method;
     get-attribute($method, 'Method::&!code').($self, |@args);
 }
 
@@ -178,6 +178,19 @@ our sub metamodel-init () {
     ClassHOW-add-method $HOWMu, Method-new($Method, 'HOW', &Mu-HOW);
     ClassHOW-add-method $HOWMu, Method-new($Method, 'WHAT', &Mu-WHAT);
     ClassHOW-add-method $HOWClassHOW, Method-new($Method, 'add-method', &ClassHOW-add-method);
+    ClassHOW-add-method $HOWClassHOW, Method-new($Method, 'find-method', &ClassHOW-find-method);
+    send $HOWMethod, 'add-method',
+      [ Method-new($Method, 'new', &Method-new) ];
+    send $HOWMu, 'add-method',
+      [ send($Method, 'new', ['new', &Mu-new ]) ];
+    send $HOWClassHOW, 'add-method',
+      [ send($Method, 'new', [ 'new', &ClassHOW-new]) ];
+    send $HOWClassHOW, 'add-method', 
+      [ send($Method, 'new', [ 'add-parent', &ClassHOW-add-parent ]) ];
+    send $HOWClassHOW, 'add-method',
+      [ send($Method, 'new', [ 'add-attribute', &ClassHOW-add-parent ]) ];
+    send $HOWAttribute, 'add-method', 
+      [ send($Method, 'new', [ 'new', &Attribute-new ]) ];
 }
 
 metamodel-init();
