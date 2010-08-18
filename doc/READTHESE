@@ -1,0 +1,16 @@
+This is a list of papers/links/source code that may be helpful in designing and implementing Bennu.
+
+=== General
+* The Synopses (http://perlcabal.org/syn/)
+
+=== Metamodel
+* S06, S9, S10, S11, S12, S13, and S14 in the Synopses
+* The various Traits papers (http://scg.unibe.ch/research/traits/)
+  Perl 6 roles are, after all, an extension of traits.
+* The Art of the Metaobject Protocol by Kiczales, des Rivieres, and Bobrow (http://www.amazon.com/Art-Metaobject-Protocol-Gregor-Kiczales/dp/0262610744/ref=sr_1_1/191-6060025-6592706?ie=UTF8&s=books&qid=1281680464&sr=8-1)
+* The metamodel bits of current Rakudo (http://github.com/rakudo/rakudo/tree/master/src/metamodel/)
+* P6object/P6metaclass in Parrot, on top of which Rakudo's current metamodel is built (http://trac.parrot.org/parrot/browser/trunk/runtime/parrot/library/P6object.pir)
+* SMOP, a runtime/interpreter that's targeted as backend by Mildew (http://svn.pugscode.org/pugs/v6/smop/)
+* Niecza, particularly Kernel.cs (http://github.com/sorear/niecza/blob/master/Kernel.cs)
+* Jonathan Worthington's prototype of the new metamodel for Rakudo/NQP-rx (http://github.com/jnthn/6model)
+* Piumarta & Warth (http://piumarta.com/software/cola/objmodel2.pdf)
