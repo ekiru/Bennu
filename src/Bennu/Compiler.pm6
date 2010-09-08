@@ -1,1 +1,1 @@
-class Bennu::Compiler does Bennu::Compiler::Compile;
+class Bennu::Compiler does Bennu::Compiler::Compile does Bennu::Compiler::Parse;
