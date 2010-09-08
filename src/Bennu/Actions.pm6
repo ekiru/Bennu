@@ -66,7 +66,9 @@ method term:sym<identifier>($/) {
     }
     default {
         my $args = $<args>.ast;
-        make Bennu::AST::Call.new(function => '&' ~ $ident,
+        make Bennu::AST::Call.new(function =>
+                                  Bennu::AST::Lexical.new(name =>
+                                                          '&' ~ $ident),
                                   args => $args);
     }
 }

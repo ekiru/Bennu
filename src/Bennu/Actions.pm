@@ -124,7 +124,9 @@ class Bennu::Actions {
             }
             default {
                 my $args = $m->{args}{_ast};
-                $m->{_ast} = Bennu::AST::Call->new(function => '&' . $ident,
+                $m->{_ast} = Bennu::AST::Call->new(function => 
+                                                   Bennu::AST::Lexical->new(name =>
+                                                                            '&' . $ident),
                                                    args => $args);
             }
         }
