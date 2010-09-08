@@ -25,7 +25,7 @@ class Bennu::AST::Labelled is Bennu::AST {
 # Compound expression ASTs
 
 class Bennu::AST::Call is Bennu::AST {
-    has function => (is => 'ro', isa => 'Str');
+    has function => (is => 'ro');
     has args => (is => 'ro', default => sub { [] });
 }
 
