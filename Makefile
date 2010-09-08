@@ -1,16 +1,8 @@
-STDBASE:=$(shell pwd)/STD_checkout
-STDENV=PERL5LIB=$(STDBASE) PERL6LIB=$(STDBASE):$(STDBASE)/lib
+PERL = perl
 
-all: .STD_build_stamp
+all: grammar
 
-.STD_checkout_stamp: STD_REVISION
-	if [ ! -d STD_checkout ]; then \
-	    svn checkout http://svn.pugscode.org/pugs/src/perl6@`cat STD_REVISION` STD_checkout; \
-	else \
-	    svn update -r`cat STD_REVISION` STD_checkout; \
-	fi
-	touch .STD_checkout_stamp
+grammar: src/Bennu/Grammar.pmc
 
-.STD_build_stamp: .STD_checkout_stamp
-	cd STD_checkout && make && ./tryfile STD.pm6
-	touch .STD_build_stamp
+src/Bennu/Grammar.pmc: src/Bennu/Grammar.pm6
+	viv --noperl6lib -5 -o src/Bennu/Grammar.pmc src/Bennu/Grammar.pm6

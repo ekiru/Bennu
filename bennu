@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+use lib 'src';
+use 5.010;
+
+use Bennu::Compiler;
+use Data::Dumper;
+
+say Dumper(Bennu::Compiler->new->compilefile($ARGV[0]));
+
+# Local Variables:
+#   mode: cperl
+# End:
