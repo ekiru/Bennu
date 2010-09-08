@@ -7,7 +7,7 @@ class CompilationUnit is Bennu::AST {
 # Statement-ish ASTS
 
 class StatementList is Bennu::AST {
-    has @.children handles <push> = [] ;
+    has @.statements handles <push> = [] ;
 }
 
 class Labelled is Bennu::AST {

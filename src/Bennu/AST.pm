@@ -11,10 +11,10 @@ class Bennu::AST::CompilationUnit is Bennu::AST {
 # Statement-ish ASTS
 
 class Bennu::AST::StatementList is Bennu::AST {
-    has children => (is => 'ro', default => sub { [] });
+    has statements => (is => 'ro', default => sub { [] });
 
     method push($child) {
-        push @{$self->children}, $child;
+        push @{$self->statements}, $child;
     }
 }
 
