@@ -4,8 +4,10 @@ use Bennu::AST;
 
 method ws($/) { }
 method vws($/) { }
+method unv($/) { }
 method begid($/) { }
 method spacey($/) { }
+method nofun($/) { }
 
 method unitstart($/) { }
 
@@ -36,6 +38,32 @@ method twigil($/) {
     make ~$/;
 }
 method twigil:sym<.>($/) { }
+
+method typename($/) {
+    my $type;
+    if $<identifier> :exists {
+        # ::?CLASS
+        $/.sorry('::?CLASS not yet implemented.');
+    }
+    else {
+        $type = $<longname>.ast;
+    }
+    if +$<typename> {
+        # typename of typename
+        $/.sorry('infix:<of> not yet implemented.');
+    }
+    else {
+        if +$<param> {
+            $/.sorry('Parameterized types not yet implemented.');
+        }
+        if +$<whence> {
+            $/.sorry('WHENCE not yet implemented.');
+        }
+        else {
+            make $type;
+        }
+    }
+}
 
 method termish($/) { }
 

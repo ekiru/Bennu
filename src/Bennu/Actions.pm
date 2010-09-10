@@ -56,8 +56,10 @@ class Bennu::Actions {
 
     method ws($m) { }
     method vws($m) { }
+    method unv($m) { }
     method begid($m) { }
     method spacey($m) { }
+    method nofun($m) { }
 
     method unitstart($m) { }
 
@@ -89,6 +91,30 @@ class Bennu::Actions {
         $m->{_ast} = $m->Str;
     }
     method twigil__S_Dot($m) { }
+
+    method typename($m) {
+        my $type;
+        if (exists $m->{identifier}) {
+            $m->sorry('::$?CLASS not yet implemented.');
+        }
+        else {
+            $type = $m->{longname}{_ast};
+        }
+        if (@{$m->{typename}}) {
+            $m->sorry('infix:<of> not yet implemented.');
+        }
+        else {
+            if (@{$m->{param}}) {
+                $m->sorry('Parameterized types not yet implemented.');
+            }
+            if (@{$m->{whence}}) {
+                $m->sorry('WHENCE not yet implemented.');
+            }
+            else {
+                $m->{_ast} = $type;
+            }
+        }
+    }
 
     method termish($m) { }
 
