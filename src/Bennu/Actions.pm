@@ -56,6 +56,7 @@ class Bennu::Actions {
 
     method ws($m) { }
     method vws($m) { }
+    method begid($m) { }
     method spacey($m) { }
 
     method unitstart($m) { }
@@ -78,6 +79,16 @@ class Bennu::Actions {
     method identifier($m) {
         $m->{_ast} = $m->Str;
     }
+
+    method sigil($m) {
+        $m->{_ast} = $m->Str;
+    }
+    method sigil__S_Dollar($m) { }
+
+    method twigil($m) {
+        $m->{_ast} = $m->Str;
+    }
+    method twigil__S_Dot($m) { }
 
     method termish($m) { }
 

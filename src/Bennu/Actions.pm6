@@ -4,6 +4,7 @@ use Bennu::AST;
 
 method ws($/) { }
 method vws($/) { }
+method begid($/) { }
 method spacey($/) { }
 
 method unitstart($/) { }
@@ -25,6 +26,16 @@ method ident($/) {
 method identifier($/) {
     make ~$/;
 }
+
+method sigil($/) {
+    make ~$/;
+}
+method sigil:sym<$>($/) { }
+
+method twigil($/) {
+    make ~$/;
+}
+method twigil:sym<.>($/) { }
 
 method termish($/) { }
 
