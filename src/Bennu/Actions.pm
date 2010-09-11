@@ -98,6 +98,23 @@ class Bennu::Actions {
         $m->{_ast} = $m->{identifier}{_ast};
     }
 
+    method variable($m) {
+        my $ast;
+        if (exists $m->{desigilname}) {
+            $ast = Bennu::AST::Lexical->new(name => $m->{desigilname}{_ast});
+        }
+        else {
+            $m->sorry("Non-simple variables not yet implemented.");
+        }
+
+        if (@{$m->{postcircumfix}}) {
+            my $post = $m->{postcircumfix}[0]{_ast};
+            unshift @{$post->args}, $ast;
+            $ast = $post;
+        }
+        $m->{_ast} = $ast;
+    }
+
     method desigilname($m) {
         given ($m) {
             when (exists $m->{variable}) {

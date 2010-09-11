@@ -45,6 +45,23 @@ method name($/) {
     make $<identifier>.ast;
 }
 
+method variable($/) {
+    my $ast;
+    if $<desigilname> :exists {
+        $ast = Bennu::AST::Lexical.new(name => $<sigil> ~ $<twigil> ~ $<desigilname>);
+    }
+    else {
+        $/.sorry("Non-simple variables not yet implemented.");
+    }
+
+    if $<postcircumfix>.elems {
+        my $post = $<postcircumfix>[0].ast;
+        $post.args.unshift($ast);
+        $ast = $post;
+    }
+    make $ast;
+}
+
 method desigilname($/) {
     when $<variable> :exists {
         $/.sorry("Contextualizing sigils not yet implemented.");
