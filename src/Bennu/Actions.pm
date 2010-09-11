@@ -82,6 +82,20 @@ class Bennu::Actions {
         $m->{_ast} = $m->Str;
     }
 
+    method longname($m) {
+        if (@{$m->{colonpair}}) {
+            $m->sorry("Adverbs to longnames not yet implemented.");
+        }
+        $m->{_ast} = $m->{name}{_ast};
+    }
+
+    method name($m) {
+        if (@{$m->{morename}}) {
+            $m->sorry("Package-qualified names not yet implemented.");
+        }
+        $m->{_ast} = $m->{identifier}{_ast};
+    }
+
     method sigil($m) {
         $m->{_ast} = $m->Str;
     }

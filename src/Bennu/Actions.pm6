@@ -29,6 +29,20 @@ method identifier($/) {
     make ~$/;
 }
 
+method longname($/) {
+    if $<colonpair>.elems {
+        $/.sorry("Adverbs to longnames not yet implemented.");
+    }
+    make $<name>.ast;
+}
+
+method name($/) {
+    if $<morename>.elems {
+        $/.sorry("Package-qualified names not yet implemented.");
+    }
+    make $<identifier>.ast;
+}
+
 method sigil($/) {
     make ~$/;
 }
