@@ -57,6 +57,8 @@ class Bennu::Actions {
     method ws($m) { }
     method vws($m) { }
     method unv($m) { }
+
+    method unspacey($m) { }
     method begid($m) { }
     method spacey($m) { }
     method nofun($m) { }
@@ -96,6 +98,17 @@ class Bennu::Actions {
         $m->{_ast} = $m->{identifier}{_ast};
     }
 
+    method desigilname($m) {
+        given ($m) {
+            when (exists $m->{variable}) {
+                $m->sorry("Sigil contextualizers not yet implemented.");
+            }
+            default {
+                $m->{_ast} = $m->{longname}{_ast};
+            }
+        }
+    }
+
     method sigil($m) {
         $m->{_ast} = $m->Str;
     }
@@ -105,6 +118,7 @@ class Bennu::Actions {
         $m->{_ast} = $m->Str;
     }
     method twigil__S_Dot($m) { }
+    method twigil__S_Bang($m) { }
 
     method typename($m) {
         my $type;
@@ -181,6 +195,10 @@ class Bennu::Actions {
                                                    args => $args);
             }
         }
+    }
+
+    method term__S_variable($m) {
+        $m->{_ast} = $m->{variable}{_ast};
     }
 
     method term__S_value($m) {

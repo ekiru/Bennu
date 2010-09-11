@@ -5,6 +5,8 @@ use Bennu::AST;
 method ws($/) { }
 method vws($/) { }
 method unv($/) { }
+
+method unspacey($/) { }
 method begid($/) { }
 method spacey($/) { }
 method nofun($/) { }
@@ -43,6 +45,15 @@ method name($/) {
     make $<identifier>.ast;
 }
 
+method desigilname($/) {
+    when $<variable> :exists {
+        $/.sorry("Contextualizing sigils not yet implemented.");
+    }
+    default {
+        make $<longname>.ast;
+    }
+}
+
 method sigil($/) {
     make ~$/;
 }
@@ -52,6 +63,7 @@ method twigil($/) {
     make ~$/;
 }
 method twigil:sym<.>($/) { }
+method twigil:sym<!>($/) { }
 
 method typename($/) {
     my $type;
@@ -128,6 +140,10 @@ method term:sym<identifier>($/) {
 
 method term:sym<value>($/) {
     make $<value>.ast;
+}
+
+method term:sym<variable>($/) {
+    make $<variable>.ast;
 }
 
 method value:sym<number>($/) {
