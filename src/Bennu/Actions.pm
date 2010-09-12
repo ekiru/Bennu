@@ -234,6 +234,11 @@ class Bennu::Actions {
         }
     }
 
+    method infix($m) {
+        $m->{_ast} = Bennu::AST::Lexical->new(name => '&infix:<' . $m->{sym} . '>');
+    }
+    method infix__S_Plus($m) { }
+
     method term($m) { }
 
     method term__S_identifier($m) {

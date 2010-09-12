@@ -179,6 +179,12 @@ method args($/) {
     }
 }
 
+method infix($/) {
+    make Bennu::AST::Lexical.new(name => '&infix:<' ~ $/<sym> ~ '>';
+}
+
+method infix:sym<+>($/) { }
+
 method term:sym<identifier>($/) {
     my $ident = $<identifier>.ast;
     when $/.is_name($<identifier>.Str) {
