@@ -1,6 +1,7 @@
 class Bennu::Actions;
 
 use Bennu::AST;
+use Bennu::Decl;
 
 method ws($/) { }
 method vws($/) { }
@@ -23,6 +24,8 @@ method unitstopper($/) { }
 method stdstopper($/) {}
 method stopper($/) { }
 
+method infixstopper($/) { }
+
 method ident($/) {
     make ~$/;
 }
@@ -43,6 +46,41 @@ method name($/) {
         $/.sorry("Package-qualified names not yet implemented.");
     }
     make $<identifier>.ast;
+}
+
+method scoped($/) {
+    when $<declarator> :exists {
+        make $<declarator>.ast;
+    }
+    default {
+        $/.sorry("Non-simple scoped declarations not yet implemented.");
+    }
+}
+
+method declarator($/) {
+    when $<variable_declarator> :exists {
+        make $<variable_declarator>.ast;
+    }
+    default {
+        $/.sorry("Not all declarators are supported.");
+    }
+}
+
+method variable_declarator($/) {
+    if $<shape>.elems {
+        $/.sorry("Shaped variable declarations not yet implemented.");
+    }
+    if $<post_constraint>.elems {
+        $/.sorry("Post constraints on variables not yet implemented.");
+    }
+    my @traits = $<trait>.map(*.ast);
+    make Bennu::Decl::Variable.new(variable => $<variable>.ast,
+                                   :@traits);
+}
+
+method multi_declarator($/) { }
+method multi_declarator:sym<null>($/) {
+    make $<declarator>.ast;
 }
 
 method variable($/) {

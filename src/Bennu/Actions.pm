@@ -53,6 +53,7 @@ class Bennu::Actions {
     }
 
     use Bennu::AST;
+    use Bennu::Decl;
 
     method ws($m) { }
     method vws($m) { }
@@ -76,6 +77,8 @@ class Bennu::Actions {
     method stdstopper($m) { }
     method stopper($m) { }
 
+    method infixstopper($m) { }
+
     method ident($m) {
         $m->{_ast} = $m->Str;
     }
@@ -96,6 +99,41 @@ class Bennu::Actions {
             $m->sorry("Package-qualified names not yet implemented.");
         }
         $m->{_ast} = $m->{identifier}{_ast};
+    }
+
+    method scoped($m) {
+        if (exists $m->{declarator}) {
+            $m->{_ast} = $m->{declarator}{_ast};
+        }
+        else {
+            $m->sorry("Non-simple scoped declarators not yet implemented.");
+        }
+    }
+
+    method declarator($m) {
+        if (exists $m->{variable_declarator}) {
+            $m->{_ast} = $m->{variable_declarator}{_ast};
+        }
+        else {
+            $m->sorry("Only variable declarators are supported.");
+        }
+    }
+
+    method variable_declarator($m) {
+        if (@{$m->{shape}}) {
+            $m->sorry("Shaped variable declarations not yet implemented.");
+        }
+        if (@{$m->{post_constraint}}) {
+            $m->sorry("Post constraints on variables not yet implemented.");
+        }
+        my @traits = map { $_->{_ast} } @{$m->{trait}};
+        $m->{_ast} = Bennu::Decl::Variable->new(variable => $m->{variable}{_ast},
+                                                traits => \@traits);
+    }
+
+    method multi_declarator($m) { }
+    method multi_declarator__S_null($m) {
+        $m->{_ast} = $m->{declarator}{_ast};
     }
 
     method variable($m) {
@@ -312,3 +350,4 @@ class Bennu::Actions {
     method terminator($m) { }
     method terminator__S_Semi($m) { }
 }
+
