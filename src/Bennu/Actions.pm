@@ -257,6 +257,10 @@ class Bennu::Actions {
         }
     }
 
+    method term__S_scope_declarator($m) {
+        $m->{_ast} = $m->{scope_declarator}{_ast};
+    }
+
     method term__S_variable($m) {
         $m->{_ast} = $m->{variable}{_ast};
     }

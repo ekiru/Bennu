@@ -199,6 +199,10 @@ method term:sym<identifier>($/) {
     }
 }
 
+method term:sym<scope_declarator>($/) {
+    make $<scope_declarator>.ast;
+}
+
 method term:sym<value>($/) {
     make $<value>.ast;
 }
