@@ -185,6 +185,8 @@ method infix($/) {
 
 method infix:sym<+>($/) { }
 
+method term($/) { }
+
 method term:sym<identifier>($/) {
     my $ident = $<identifier>.ast;
     when $/.is_name($<identifier>.Str) {
