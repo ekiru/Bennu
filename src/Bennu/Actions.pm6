@@ -181,6 +181,22 @@ method args($/) {
     }
 }
 
+method POST($/) {
+    if $<postfix_prefix_meta_operator>.elems {
+        $/.sorry('postfix_prefix_meta_operator not yet implemented.');
+        return;
+    }
+    if $<dotty> :exists {
+        make $<dotty>.ast;
+    }
+    elsif $<privop> :exists {
+       make $<privop>.ast;
+    }
+    else {
+        make $<postop>.ast;
+    } 
+}
+
 method infix($/) {
     make Bennu::AST::Lexical.new(name => '&infix:<' ~ $/<sym> ~ '>';
 }

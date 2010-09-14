@@ -236,6 +236,22 @@ class Bennu::Actions {
         }
     }
 
+    method POST($m) {
+        if (@{$m->{postfix_prefix_meta_operator}}) {
+            $m->sorry('postfix_prefix_meta_operator not yet implemented.');
+            return;
+        }
+        if (exists $m->{dotty}) {
+            $m->{_ast} = $m->{dotty}{_ast};
+        }
+        elsif (exists $m->{privop}) {
+            $m->{_ast} = $m->{privop}{_ast};
+        }
+        else {
+            $m->{_ast} = $m->{postop}{_ast};
+        }
+    }
+
     method infix($m) {
         $m->{_ast} = Bennu::AST::Lexical->new(name => '&infix:<' . $m->{sym} . '>');
     }
