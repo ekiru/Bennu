@@ -252,6 +252,19 @@ class Bennu::Actions {
         }
     }
 
+    method POSTFIX($m) {
+        my $ast;
+        if (exists $m->{dotty}) {
+            $ast = $m->{dotty}{_ast};
+        }
+        else {
+            $m->sorry('Non-dotty postfixes not yet implemented.');
+            return;
+        }
+        $ast->arg($m->{arg}{_ast});
+        $m->{_ast} = $ast;
+    }
+
     method infix($m) {
         $m->{_ast} = Bennu::AST::Lexical->new(name => '&infix:<' . $m->{sym} . '>');
     }

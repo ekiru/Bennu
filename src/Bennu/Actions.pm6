@@ -197,6 +197,19 @@ method POST($/) {
     } 
 }
 
+method POSTFIX($/) {
+    my $ast;
+    if $<dotty> :exists {
+        $ast = $<dotty>.ast;
+    }
+    else {
+        $/.sorry('Non-dotty postfixes not yet implemented.');
+        return;
+    }
+    $ast.arg = $<arg>.ast;
+    make $ast;
+}
+
 method infix($/) {
     make Bennu::AST::Lexical.new(name => '&infix:<' ~ $/<sym> ~ '>';
 }
