@@ -10,6 +10,12 @@ class StatementList is Bennu::AST {
     has @.statements handles <push> = [] ;
 }
 
+class Conditional is Bennu::AST {
+    has @.conditions;
+    has @.blocks;
+    has $.otherwise is rw;
+}
+
 class Labelled is Bennu::AST {
     has $.statement;
 }

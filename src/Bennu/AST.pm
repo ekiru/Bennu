@@ -18,6 +18,12 @@ class Bennu::AST::StatementList is Bennu::AST {
     }
 }
 
+class Bennu::AST::Conditional is Bennu::AST {
+    has conditionals => (is => 'ro', default => sub { [] });
+    has blocks => (is => 'ro', default => sub { [] });
+    has otherwise => (is => 'rw');
+}
+
 class Bennu::AST::Labelled is Bennu::AST {
     has statement => (is => 'ro');
 }
