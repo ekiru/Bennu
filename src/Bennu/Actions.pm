@@ -79,6 +79,8 @@ class Bennu::Actions {
 
     method infixstopper($m) { }
 
+    method curlycheck($m) { }
+
     method ident($m) {
         $m->{_ast} = $m->Str;
     }
@@ -267,6 +269,11 @@ class Bennu::Actions {
 
     method term__S_value($m) {
         $m->{_ast} = $m->{value}{_ast};
+    }
+
+    method dotty($m) { }
+    method dotty__S_Dot($m) {
+        $m->{_ast} = $m->{dottyop}{_ast};
     }
 
     method value($m) { }

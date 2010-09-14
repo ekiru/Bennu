@@ -26,6 +26,8 @@ method stopper($/) { }
 
 method infixstopper($/) { }
 
+method curlycheck($/) { }
+
 method ident($/) {
     make ~$/;
 }
@@ -211,6 +213,11 @@ method term:sym<value>($/) {
 
 method term:sym<variable>($/) {
     make $<variable>.ast;
+}
+
+method dotty($/) { }
+method dotty:sym<.>($/) {
+    make $<dottyop>.ast;
 }
 
 method value:sym<number>($/) {
