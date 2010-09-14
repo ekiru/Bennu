@@ -21,6 +21,11 @@ class Call is Bennu::AST {
     has @.args;
 }
 
+class MethodCall is Bennu::AST {
+    has $.name;
+    has @.args handles <unshift>;
+}
+
 # Lexical variable lookups
 
 class Lexical is Bennu::AST {

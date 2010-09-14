@@ -206,7 +206,7 @@ method POSTFIX($/) {
         $/.sorry('Non-dotty postfixes not yet implemented.');
         return;
     }
-    $ast.arg = $<arg>.ast;
+    $ast.unshift($<arg>.ast);
     make $ast;
 }
 
@@ -247,6 +247,40 @@ method term:sym<variable>($/) {
 method dotty($/) { }
 method dotty:sym<.>($/) {
     make $<dottyop>.ast;
+}
+
+method dottyop($/) {
+    when $<methodop> :exists {
+        make $<methodop>.ast;
+    }
+    when $<colonpair> :exists {
+        make $<colonpair>.ast;
+    }
+    when $<postop> :exists {
+        make $<postop>.ast;
+    }
+}
+
+method methodop($/) {
+    my $ast;
+    if $<longname> :exists {
+        $ast = Bennu::AST::MethodCall.new(name => $<longname>.ast);
+    }
+    elsif $<variable> :exists {
+        $ast = Bennu::AST::Call.new(function => $<variable>.ast);
+    }
+    elsif $<quote> :exists {
+        $ast = Bennu::AST::IndirectMethodCall.new(name => $<quote>.ast);
+    }
+
+    if $<arglist>.elems {
+        $ast.args = $<arglist>[0].ast;
+    }
+    elsif $<args>.elems {
+        $ast.$args = $<args>[0].ast;
+    }
+
+    make $ast;
 }
 
 method value:sym<number>($/) {

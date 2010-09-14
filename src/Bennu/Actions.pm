@@ -261,7 +261,7 @@ class Bennu::Actions {
             $m->sorry('Non-dotty postfixes not yet implemented.');
             return;
         }
-        $ast->arg($m->{arg}{_ast});
+        $ast->unshift($m->{arg}{_ast});
         $m->{_ast} = $ast;
     }
 
@@ -303,6 +303,40 @@ class Bennu::Actions {
     method dotty($m) { }
     method dotty__S_Dot($m) {
         $m->{_ast} = $m->{dottyop}{_ast};
+    }
+
+    method dottyop($m) {
+        if (exists $m->{methodop}) {
+            $m->{_ast} = $m->{methodop}{_ast};
+        }
+        elsif (exists $m->{colonpair}) {
+            $m->{_ast} = $m->{colonpair}{_ast};
+        }
+        elsif (exists $m->{postop}) {
+            $m->{_ast} = $m->{postop}{_ast};
+        }
+    }
+
+    method methodop($m) {
+        my $ast;
+        if (exists $m->{longname}) {
+            $ast = Bennu::AST::MethodCall->new(name => $m->{longname}{_ast});
+        }
+        elsif (exists $m->{variable}) {
+            $ast = Bennu::AST::Call->new(function => $m->{variable}{_ast});
+        }
+        elsif (exists $m->{quote}) {
+            $ast = Bennu::AST::IndirectMethodCall->new(name => $m->{quote}{_ast});
+        }
+
+        if (@{$m->{arglist}}) {
+            $ast->args($m->{arglist}[0]{_ast});
+        }
+        elsif (@{$m->{args}}) {
+            $ast->args($m->{args}[0]{_ast});
+        }
+
+        $m->{_ast} = $ast;
     }
 
     method value($m) { }

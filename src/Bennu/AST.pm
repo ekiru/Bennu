@@ -29,6 +29,15 @@ class Bennu::AST::Call is Bennu::AST {
     has args => (is => 'ro', default => sub { [] });
 }
 
+class Bennu::AST::MethodCall is Bennu::AST {
+    has name => (is => 'ro');
+    has args => (is => 'rw', default => sub { [] });
+
+    method unshift($arg) {
+        unshift @{$self->args}, $arg;
+    }
+}
+
 # Lexical variable lookups
 
 class Bennu::AST::Lexical is Bennu::AST {
