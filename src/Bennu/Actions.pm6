@@ -358,6 +358,24 @@ method statement($/) {
     }
 }
 
+method statement_control($/) { }
+
+method statement_control:sym<if>($/) {
+    my @conditions = $<xblock><EXPR>.ast;
+    my @blocks = $<xblock><pblock>.ast;
+    for $<elsif>.list -> $xblock {
+        @conditions.push($xblock<EXPR>.ast);
+        @blocks.push($xblock<pblock>.ast);
+    }
+
+    my $ast = Bennu::AST::Conditional.new(:@conditions, :@blocks);
+    $ast.otherwise = $<else>[0].ast
+        if $<else>.elems;
+    make $ast; 
+}
+
+method xblock($/) { }
+
 method eat_terminator($/) { }
 
 method terminator($/) { }

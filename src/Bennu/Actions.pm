@@ -424,6 +424,25 @@ class Bennu::Actions {
         }
     }
 
+    method statement_control($m) { }
+
+    method statement_control__S_if($m) {
+        my @conditions = $m->{xblock}{EXPR}{_ast};
+        my @blocks = $m->{xblock}{pblock}{_ast};
+        for my $xblock (@{$m->{elsif}}) {
+            push @conditions, $xblock->{EXPR}{_ast};
+            push @blocks, $xblock->{pblock}{_ast};
+        }
+
+        my $ast = Bennu::AST::Conditional->new(conditions => \@conditions,
+                                               blocks => \@blocks);
+        $ast->otherwise($m->{else}[0]{_ast})
+            if @{$m->{else}};
+        $m->{_ast} = $ast;
+    }
+
+    method xblock($m) { }
+
     method eat_terminator($m) { }
 
     method terminator($m) { }
