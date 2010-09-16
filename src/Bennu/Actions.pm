@@ -443,10 +443,19 @@ class Bennu::Actions {
 
     method blockoid($m) {
         if (exists $m->{statementlist}) {
-            $m->{_ast} = Bennu::AST::Block->new(statementlist => $m->{statementlist}{_ast});
+            $m->{_ast} = $m->{statementlist}{_ast};
         }
         else {
             $m->sorry('{YOU_ARE_HERE not yet implemented... seriously.');
+        }
+    }
+
+    method pblock($m) {
+        if (exists $m->{lambda}) {
+            $m->sorry('Lambdas not yet implemented.');
+        }
+        else {
+            $m->{_ast} = Bennu::AST::Block->new(body => $m->{blockoid}{_ast});
         }
     }
 

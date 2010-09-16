@@ -383,6 +383,15 @@ method blockoid($/) {
     }
 }
 
+method pblock($/) {
+    if $<lambda> :exists {
+        $/.sorry('Lambdas not yet implemented.');
+    }
+    else {
+        make Bennu::AST::Block.new(body => $<blockoid>.ast);
+    }
+}
+
 method xblock($/) { }
 
 method eat_terminator($/) { }

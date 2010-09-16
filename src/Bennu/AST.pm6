@@ -7,7 +7,7 @@ class CompilationUnit is Bennu::AST {
 # Blocky ASTs
 
 class Block is Bennu::AST {
-    has $.statementlist;
+    has $.body;
 }
 
 # Statement-ish ASTS
