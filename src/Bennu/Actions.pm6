@@ -374,6 +374,15 @@ method statement_control:sym<if>($/) {
     make $ast; 
 }
 
+method blockoid($/) {
+    if $<statementlist> :exists {
+        make Bennu::AST::Block.new(statementlist => $<statementlist>.ast);
+    }
+    else {
+        $/.sorry('{YOU_ARE_HERE} not yet implemented... seriously.');
+    }
+}
+
 method xblock($/) { }
 
 method eat_terminator($/) { }

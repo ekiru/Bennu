@@ -441,6 +441,15 @@ class Bennu::Actions {
         $m->{_ast} = $ast;
     }
 
+    method blockoid($m) {
+        if (exists $m->{statementlist}) {
+            $m->{_ast} = Bennu::AST::Block->new(statementlist => $m->{statementlist}{_ast});
+        }
+        else {
+            $m->sorry('{YOU_ARE_HERE not yet implemented... seriously.');
+        }
+    }
+
     method xblock($m) { }
 
     method eat_terminator($m) { }

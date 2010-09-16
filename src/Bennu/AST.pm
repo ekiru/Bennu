@@ -8,6 +8,12 @@ class Bennu::AST::CompilationUnit is Bennu::AST {
     has statementlist => (is => 'ro');
 }
 
+# Blocky ASTs
+
+class Bennu::AST::Block is Bennu::AST {
+    has statementlist => (is => 'ro');
+}
+
 # Statement-ish ASTS
 
 class Bennu::AST::StatementList is Bennu::AST {

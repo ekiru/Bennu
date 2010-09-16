@@ -4,6 +4,12 @@ class CompilationUnit is Bennu::AST {
     has $.statementlist;
 }
 
+# Blocky ASTs
+
+class Block is Bennu::AST {
+    has $.statementlist;
+}
+
 # Statement-ish ASTS
 
 class StatementList is Bennu::AST {
