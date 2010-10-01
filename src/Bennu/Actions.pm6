@@ -199,6 +199,18 @@ method args($/) {
     }
 }
 
+method circumfix($/) { }
+
+method circumfix:sym<( )>($/) {
+    my @children = $<semilist>.ast.grep: *.defined;
+    if @children == 1 {
+        make @children[0];
+    }
+    else {
+        $/.sorry('Parcels with multiple elements not yet implemented.');
+    }
+}
+
 method POST($/) {
     if $<postfix_prefix_meta_operator>.elems {
         $/.sorry('postfix_prefix_meta_operator not yet implemented.');
@@ -229,7 +241,7 @@ method POSTFIX($/) {
 }
 
 method infix($/) {
-    make Bennu::AST::Lexical.new(name => '&infix:<' ~ $/<sym> ~ '>';
+    make Bennu::AST::Lexical.new(name => '&infix:<' ~ $/<sym> ~ '>');
 }
 
 method infix:sym<+>($/) { }
@@ -351,6 +363,10 @@ method statementlist($/) {
     }
     make $ast;
 }
+    
+method semilist($/) {
+    make $<statement>.>>.ast;
+}
 
 method statement($/) {
     when $<label> :exists {
@@ -416,3 +432,4 @@ method eat_terminator($/) { }
 
 method terminator($/) { }
 method terminator:sym<;>($/) { }
+method terimnator:sym<)>($/) { }

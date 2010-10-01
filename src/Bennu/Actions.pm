@@ -256,6 +256,18 @@ class Bennu::Actions {
         }
     }
 
+    method circumfix($m) { }
+
+    method circumfix__S_Paren_Thesis($m) {
+        my @children = grep { defined } @{ $m->{semilist}{_ast} };
+        if (@children == 1) {
+            $m->{_ast} = $children[0];
+        }
+        else {
+            $m->sorry('Parcels with multiple elements not yet implemented.');
+        }
+    }
+
     method POST($m) {
         if (@{$m->{postfix_prefix_meta_operator}}) {
             $m->sorry('postfix_prefix_meta_operator not yet implemented.');
@@ -416,6 +428,10 @@ class Bennu::Actions {
         $m->{_ast} = $ast;
     }
 
+    method semilist($m) {
+        $m->{_ast} = [ map { $_->{_ast} } @{ $m->{statement} } ];
+    }
+
     method statement($m) {
         given ($m) {
             when (exists $m->{label}) {
@@ -485,5 +501,6 @@ class Bennu::Actions {
 
     method terminator($m) { }
     method terminator__S_Semi($m) { }
+    method terminator__S_Thesis($m) { }
 }
 
