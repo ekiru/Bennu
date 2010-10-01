@@ -1,5 +1,16 @@
 class Bennu::Actions;
 
+has @!CLASS-STACK;
+
+method CLASS {
+    if @!CLASS-STACK.elems {
+        @!CLASS-STACK[*-1]
+    }
+    else {
+        die 'Invalid use of ::?CLASS outside of a class.';
+    }
+}
+
 use Bennu::AST;
 use Bennu::Decl;
 
@@ -48,6 +59,12 @@ method name($/) {
         $/.sorry("Package-qualified names not yet implemented.");
     }
     make $<identifier>.ast;
+}
+
+method scope_declarator($/) { }
+
+method scope_declarator:sym<has>($/) {
+    make @.CLASS.add-attribute($<declarator>.ast);
 }
 
 method scoped($/) {

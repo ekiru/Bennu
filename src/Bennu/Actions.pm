@@ -52,6 +52,17 @@ class Bennu::Actions {
         }
     }
 
+    has CLASS_STACK => (is => 'ro', default => sub { [] });
+
+    method CLASS () {
+        if (scalar @{$self->CLASS_STACK}) {
+            $self->CLASS_STACK->[-1];
+        }
+        else {
+            die 'Invalid use of ::?CLASS outside of a class.';
+        }
+    }
+
     use Bennu::AST;
     use Bennu::Decl;
 
@@ -101,6 +112,13 @@ class Bennu::Actions {
             $m->sorry("Package-qualified names not yet implemented.");
         }
         $m->{_ast} = $m->{identifier}{_ast};
+    }
+
+    method scope_declarator($m) { }
+
+    method scope_declarator__S_has($m) {
+        $m->{_ast} =
+          $self->CLASS->add_attribute($m->{declarator}{_ast});
     }
 
     method scoped($m) {
