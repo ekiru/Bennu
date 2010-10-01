@@ -64,7 +64,7 @@ method name($/) {
 method scope_declarator($/) { }
 
 method scope_declarator:sym<has>($/) {
-    make @.CLASS.add-attribute($<declarator>.ast);
+    make @.CLASS.how.add-attribute(@.CLASS, $<declarator>.ast);
 }
 
 method scoped($/) {

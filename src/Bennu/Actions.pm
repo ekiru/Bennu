@@ -118,7 +118,8 @@ class Bennu::Actions {
 
     method scope_declarator__S_has($m) {
         $m->{_ast} =
-          $self->CLASS->add_attribute($m->{declarator}{_ast});
+          $self->CLASS->how->add_attribute($self->CLASS,
+                                           $m->{declarator}{_ast});
     }
 
     method scoped($m) {
