@@ -65,6 +65,7 @@ class Bennu::Actions {
 
     use Bennu::AST;
     use Bennu::Decl;
+    use Bennu::MOP;
 
     method ws($m) { }
     method vws($m) { }

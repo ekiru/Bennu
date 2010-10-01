@@ -13,6 +13,7 @@ method CLASS {
 
 use Bennu::AST;
 use Bennu::Decl;
+use Bennu::MOP;
 
 method ws($/) { }
 method vws($/) { }
