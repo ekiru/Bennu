@@ -158,6 +158,19 @@ class Bennu::Actions {
         $m->{_ast} = $m->{declarator}{_ast};
     }
 
+    method trait($m) {
+        given ($m) {
+            when (exists $m->{trait_mod}) {
+                $m->{_ast} = $m->{trait_mod}{_ast};
+            }
+            when (exists $m->{colonpair}) {
+                $m->{_ast} = $m->{colonpair}{_ast};
+            }
+        }
+    }
+
+    method trait_mod($m) { }
+
     method variable($m) {
         my $ast;
         if (exists $m->{desigilname}) {

@@ -103,6 +103,17 @@ method multi_declarator:sym<null>($/) {
     make $<declarator>.ast;
 }
 
+method trait($/) {
+    when $<trait_mod>:exists {
+        make $<trait_mod>.ast;
+    }
+    when $<colonpair>:exists {
+        make $<colonpair>.ast;
+    }
+}
+
+method trait_mod($/) { }
+
 method variable($/) {
     my $ast;
     if $<desigilname> :exists {
