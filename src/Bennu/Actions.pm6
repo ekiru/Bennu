@@ -93,7 +93,8 @@ method package_def($/) {
         $body = $<blockoid>.ast;
     }
     else {
-        $body = $<statementlist>.ast;
+        $/.sorry("Semicolon form of $*PKGDECL definition not yet implemented.");
+        return;
     }
 
     make {:$name, :@traits, :$body};

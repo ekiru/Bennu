@@ -148,7 +148,9 @@ class Bennu::Actions {
             $body = $m->{blockoid}{_ast};
         }
         else {
-            $body = $m->{statementlist}{_ast};
+            $m->sorry('Semicolon form of ' . $::PKGDECL
+                      . ' definition not yet implemented');
+            return;
         }
 
         $m->{_ast} = { name => $name,
