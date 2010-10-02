@@ -118,9 +118,19 @@ class Bennu::Actions {
     method scope_declarator($m) { }
 
     method scope_declarator__S_has($m) {
-        $m->{_ast} =
-          $self->CLASS->how->add_attribute($self->CLASS,
-                                           $m->{declarator}{_ast});
+        my $ast = $m->{scoped}{_ast};
+        $ast->scope('has');
+        $m->{_ast} = $ast;
+    }
+
+    method package_declarator($m) { }
+
+    method package_declarator__S_class($m) {
+        my %package_def = %{ $m->{package_def}{_ast} };
+        $m->{_ast} = 
+          Bennu::Decl::Class->new(name => $package_def{name},
+                                  body => $package_def{body},
+                                  traits => $package_def{traits});
     }
 
     method scoped($m) {

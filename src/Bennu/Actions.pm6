@@ -65,7 +65,18 @@ method name($/) {
 method scope_declarator($/) { }
 
 method scope_declarator:sym<has>($/) {
-    make @.CLASS.how.add-attribute(@.CLASS, $<declarator>.ast);
+    my $ast = $<scoped>.ast;
+    $ast.scope = 'has';
+    make $ast;
+}
+
+method package_declarator($/) { }
+
+method package_declarator:sym<class>($/) {
+    my $package-def = $<package_def>.ast;
+    make Bennu::Decl::Class.new(:name($package-def<name>),
+                                :body($package-def<body>),
+                                :traits($package-def<traits>));
 }
 
 method scoped($/) {
