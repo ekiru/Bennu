@@ -194,6 +194,36 @@ class Bennu::Actions {
         $m->{_ast} = $m->{declarator}{_ast};
     }
 
+    method method_def($m) {
+        if (exists $m->{sigil}) {
+            $m->sorry('Sigil-dot-postcirumfix method definitions not yet implemented.');
+            return;
+        }
+        if ($m->{type}->Str) {
+            my $type = $m->{type}->Str eq '!' ? 'Private' : 'Meta';
+            $m->sorry("$type method definitions not yet implemented.");
+            return;
+        }
+        if (@{ $m->{multisig} } > 1) {
+            $m->sorry('Multiple multisigs in a method definition not yet implemented.');
+            return;
+        }
+        if ($::SCOPE ~~ ['augment', 'supersede', 'state']) {
+            $m->sorry("Illogical scope $::SCOPE for method");
+            return;
+        }
+
+        my $name = $m->{longname}{_ast};
+        my $sig = $m->{multisig}[0]{_ast}
+          // Bennu::Decl::Method->default_signature;
+        my @traits = map { $_->{_ast} } @{ $m->{trait} };
+        my $body = $m->{blockoid}{_ast};
+        $m->{_ast} = Bennu::Decl::Method->new(name => $name,
+                                              sig => $sig,
+                                              body => $body,
+                                              traits => \@traits);
+    }
+
     method trait($m) {
         given ($m) {
             when (exists $m->{trait_mod}) {

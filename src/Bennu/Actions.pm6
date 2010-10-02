@@ -137,6 +137,32 @@ method multi_declarator:sym<null>($/) {
     make $<declarator>.ast;
 }
 
+method method_def($/) {
+    if $<sigil>:exists {
+        $/.sorry('Sigil-dot-postcirumfix method definitions not yet implemented.');
+        return;
+    }
+    if ~$<type> {
+        my $type = $<type> eq '!' ?? 'Private' !! 'Meta';
+        $/.sorry("$type method definitions not yet implemented.");
+        return;
+    }
+    if $<multisig>.elems > 1 {
+        $/.sorry('Multiple multisigs in a method definition not yet implemented.');
+        return;
+    }
+    if $*SCOPE eq 'augment'|'supersede'|'state' {
+        $/.sorry("Illogical scope $scope for method");
+        return;
+    }
+
+    my $name = $<longname>.ast;
+    my $sig = $<multisig>[0].?ast // Bennu::Decl::Method.default-signature;
+    my @traits = $<trait>.>>.ast;
+    my $body = $<blockoid>.ast;
+    make Bennu::Decl::Method.new(:$name, :$sig, :$body, :@traits);
+}
+
 method trait($/) {
     when $<trait_mod>:exists {
         make $<trait_mod>.ast;
