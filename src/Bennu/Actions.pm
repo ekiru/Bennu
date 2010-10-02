@@ -194,6 +194,12 @@ class Bennu::Actions {
         $m->{_ast} = $m->{declarator}{_ast};
     }
 
+    method routine_declarator($m) { }
+
+    method routine_declarator__S_method($m) {
+        $m->{_ast} = $m->{method_def}{_ast};
+    }
+
     method method_def($m) {
         if (exists $m->{sigil}) {
             $m->sorry('Sigil-dot-postcirumfix method definitions not yet implemented.');

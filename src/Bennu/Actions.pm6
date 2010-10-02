@@ -137,6 +137,12 @@ method multi_declarator:sym<null>($/) {
     make $<declarator>.ast;
 }
 
+method routine_declarator($/) { }
+
+method routine_declarator:sym<method>($/) {
+    make $<method_def>.ast;
+}
+
 method method_def($/) {
     if $<sigil>:exists {
         $/.sorry('Sigil-dot-postcirumfix method definitions not yet implemented.');
