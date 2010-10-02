@@ -132,6 +132,30 @@ class Bennu::Actions {
         }
     }
 
+    method package_def($m) {
+        unless (scalar @{ $m->{longname} }) {
+            $m->sorry('Anonymous packages not yet implemented.');
+            return;
+        }
+        if (scalar @{ $m->{signature} }) {
+            $m->sorry('Generic roles not yet implemented.');
+            return;
+        }
+        my $name = $m->{longname}[0]{_ast};
+        my @traits = map { $_->{_ast} } @{ $m->{trait} };
+        my $body;
+        if (exists $m->{blockoid}) {
+            $body = $m->{blockoid}{_ast};
+        }
+        else {
+            $body = $m->{statementlist}{_ast};
+        }
+
+        $m->{_ast} = { name => $name,
+                       traits => \@traits,
+                       body => $body };
+    }
+
     method declarator($m) {
         if (exists $m->{variable_declarator}) {
             $m->{_ast} = $m->{variable_declarator}{_ast};

@@ -77,6 +77,28 @@ method scoped($/) {
     }
 }
 
+method package_def($/) {
+    unless $<longname>.elems {
+        $/.sorry('Anonymous packages not yet implemented.');
+        return;
+    }
+    if $<signature>.elems {
+        $/.sorry('Generic roles not yet implemented.');
+        return;
+    }
+    my $name = $<longname>[0].ast;
+    my @traits = $<trait>.>>.ast;
+    my $body;
+    if $<blockoid>:exists {
+        $body = $<blockoid>.ast;
+    }
+    else {
+        $body = $<statementlist>.ast;
+    }
+
+    make {:$name, :@traits, :$body};
+}
+
 method declarator($/) {
     when $<variable_declarator> :exists {
         make $<variable_declarator>.ast;
