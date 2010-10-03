@@ -251,7 +251,13 @@ class Bennu::Actions {
     method variable($m) {
         my $ast;
         if (exists $m->{desigilname}) {
-            $ast = Bennu::AST::Lexical->new(name => $m->{desigilname}{_ast});
+            my $name =
+              $m->{sigil}{_ast} .
+              ($m->{twigil}[0] ?
+               $m->{twigil}[0]{_ast} :
+               '') .
+              $m->{desigilname}{_ast};
+            $ast = Bennu::AST::Lexical->new(name => $name);
         }
         else {
             $m->sorry("Non-simple variables not yet implemented.");

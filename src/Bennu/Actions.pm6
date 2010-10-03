@@ -188,7 +188,11 @@ method trait_mod($/) { }
 method variable($/) {
     my $ast;
     if $<desigilname> :exists {
-        $ast = Bennu::AST::Lexical.new(name => $<sigil> ~ $<twigil> ~ $<desigilname>);
+        my $name =
+          $<sigil>.ast ~
+          ($<twigil>[0]:exists ?? $<twigil>[0].ast !! '') ~
+          $<desigilname>.ast;
+        $ast = Bennu::AST::Lexical.new(:$name);
     }
     else {
         $/.sorry("Non-simple variables not yet implemented.");
