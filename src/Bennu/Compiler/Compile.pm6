@@ -1,9 +1,11 @@
 role Bennu::Compiler::Compile;
 
 method compilefile($file) {
-    self.parsefile($file);
+    my $ast = self.parsefile($file);
+    $ast = self.lift-decls($ast);
 }
 
 method compile($source) {
-    self.parse($source);
+    my $ast = self.parse($source);
+    $ast = self.lift-decls($ast);
 }

@@ -5,11 +5,15 @@ role Bennu::Compiler::Compile {
     requires 'parsefile';
     requires 'parse';
 
+    requires 'lift_decls';
+
     method compilefile($file) {
-        return $self->parsefile($file);
+        my $ast = $self->parsefile($file);
+        $ast = $self->lift_decls($ast);
     }
 
     method compile($source) {
-        return $self->parse($source);
+        my $ast = $self->parse($source);
+        $ast = $self->lift_decls($ast);
     }
 }
