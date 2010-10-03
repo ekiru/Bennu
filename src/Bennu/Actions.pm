@@ -436,6 +436,14 @@ class Bennu::Actions {
         }
     }
 
+    method INFIX($m) {
+        my $func = $m->{_ast};
+        $m->{_ast} =
+          Bennu::AST::Call->new(function => $func,
+                                args => [ $m->{left}{_ast},
+                                          $m->{right}{_ast} ]);
+    }
+
     method dotty($m) { }
     method dotty__S_Dot($m) {
         $m->{_ast} = $m->{dottyop}{_ast};

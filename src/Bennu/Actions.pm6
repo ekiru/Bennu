@@ -370,6 +370,13 @@ method infixish($/) {
     }
 }
 
+method INFIX($/) {
+    my $func = $/.ast;
+    make Bennu::AST::Call.new(function => $func,
+                              args => [ $<left>.ast,
+                                        $<right>.ast]);
+}
+
 method dotty($/) { }
 method dotty:sym<.>($/) {
     make $<dottyop>.ast;
