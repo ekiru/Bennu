@@ -339,8 +339,16 @@ method term:sym<identifier>($/) {
     }
 }
 
+method term:sym<package_declarator>($/) {
+    make $<package_declarator>.ast;
+}
+
 method term:sym<scope_declarator>($/) {
     make $<scope_declarator>.ast;
+}
+
+method term:sym<routine_declarator($/) {
+    make $<routine_declarator>.ast;
 }
 
 method term:sym<value>($/) {
