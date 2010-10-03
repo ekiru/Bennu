@@ -359,6 +359,17 @@ method term:sym<variable>($/) {
     make $<variable>.ast;
 }
 
+method infixish($/) {
+    if $<colonpair> :exists {
+        make $<colonpair>.ast
+    }
+    elsif $<infix_postfix_meta_operator>.elems {
+        make $<infix_postfix_meta_operator>.ast;
+    } else {
+        make $<infix>.ast;
+    }
+}
+
 method dotty($/) { }
 method dotty:sym<.>($/) {
     make $<dottyop>.ast;

@@ -425,6 +425,17 @@ class Bennu::Actions {
         $m->{_ast} = $m->{value}{_ast};
     }
 
+    method infixish($m) {
+        if (exists $m->{colonpair}) {
+            $m->{_ast} = $m->{colonpair}{_ast};
+        }
+        elsif (scalar @{ $m->{infix_postfix_meta_operator} }) {
+            $m->{_ast} = $m->{infix_postfix_meta_operator}{_ast};
+        } else {
+            $m->{_ast} = $m->{infix}{_ast};
+        }
+    }
+
     method dotty($m) { }
     method dotty__S_Dot($m) {
         $m->{_ast} = $m->{dottyop}{_ast};
