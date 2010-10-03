@@ -137,6 +137,11 @@ class Bennu::Actions {
         if (exists $m->{declarator}) {
             $m->{_ast} = $m->{declarator}{_ast};
         }
+        elsif (@{ $m->{typename} } == 1) {
+            my $ast = $m->{multi_declarator}{_ast};
+            $ast->add_constraint($m->{typename}[0]{_ast});
+            $m->{_ast} = $ast;
+        }
         else {
             $m->sorry("Non-simple scoped declarators not yet implemented.");
         }

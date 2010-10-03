@@ -83,6 +83,11 @@ method scoped($/) {
     when $<declarator> :exists {
         make $<declarator>.ast;
     }
+    when $<typename>.elems == 1 {
+        my $ast = $<multi_declarator>.ast;
+        $ast.add-constraint($<typename>[0].ast);
+        make $ast;
+    }
     default {
         $/.sorry("Non-simple scoped declarations not yet implemented.");
     }

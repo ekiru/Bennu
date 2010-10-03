@@ -22,6 +22,11 @@ class Method is Bennu::Decl {
 class Variable is Bennu::Decl {
   has $.variable;
   has @.traits;
+  has @.constraints; # type constraints
 
   submethod BUILD (:$.scope = 'my') { }
+
+  method add-constraint ($constraint) {
+      @.constraints.push($constraint);
+  }
 }

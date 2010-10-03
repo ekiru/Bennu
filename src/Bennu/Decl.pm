@@ -25,6 +25,11 @@ class Bennu::Decl::Method extends Bennu::Decl {
 class Bennu::Decl::Variable extends Bennu::Decl {
     has variable => (is => 'ro');
     has traits => (is => 'ro', default => sub { [] });
+    has constraints => (is => 'ro', default => sub { [] });
 
     method _build_scope () { 'my' }
+
+    method add_constraint ($constraint) {
+        push @{ $self->constraints }, $constraint;
+    }
 }
