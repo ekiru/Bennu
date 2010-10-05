@@ -1,6 +1,10 @@
 use MooseX::Declare;
 
 class Bennu::Decl {
+    use MooseX::Types -declare => [qw(ClassDecl)];
+
+    class_type ClassDecl, { class => 'Bennu::Decl::Class' };
+
     has scope => (is => 'rw', builder => '_build_scope');
 }
 

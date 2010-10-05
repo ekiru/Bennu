@@ -5,7 +5,7 @@ class Bennu::AST {
 }
 
 class Bennu::AST::CompilationUnit is Bennu::AST {
-    has statementlist => (is => 'ro');
+    has statementlist => (is => 'ro', handles => [qw(walk)]);
 }
 
 # Blocky ASTs
@@ -21,6 +21,13 @@ class Bennu::AST::StatementList is Bennu::AST {
 
     method push($child) {
         push @{$self->statements}, $child;
+    }
+
+    method walk($cb) {
+        for (@{ $self->statements }) {
+            $_ = $cb->($_);
+        }
+        $self;
     }
 }
 

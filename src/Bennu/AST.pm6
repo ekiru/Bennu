@@ -1,7 +1,7 @@
 class Bennu::AST;
 
 class CompilationUnit is Bennu::AST {
-    has $.statementlist;
+    has $.statementlist handles <walk>;
 }
 
 # Blocky ASTs
@@ -14,6 +14,13 @@ class Block is Bennu::AST {
 
 class StatementList is Bennu::AST {
     has @.statements handles <push> = [] ;
+
+    method walk (&cb) {
+        for @.statements -> $statement is rw {
+            $statement .= &cb;
+        }
+        self;
+    }
 }
 
 class Conditional is Bennu::AST {
