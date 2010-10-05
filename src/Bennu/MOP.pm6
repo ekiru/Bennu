@@ -2,14 +2,29 @@ module Bennu::MOP;
 
 class Mu {
     has $.how is rw;
-    has $.defined;
+}
+
+class Package is Mu {
+    has $.name;
+    has %!static-definitions;
+    has %!static-names;
+
+    method assign-static($name, $value) {
+        %!static-names{$name} = 1;
+        %!static-definitions{$name} = $value;
+    }
+}
+
+class ClassWHAT is Package {
+    method defined { False }
+    method type { 'class' }
 }
 
 class ClassHOW is Mu {
     has $.name is rw;
 
     method new-type-object {
-        Mu.new(:defined(False), :how(self));
+        ClassWHAT.new(:how(self), :$.name);
     }
 
     method add-attribute($obj, $attribute) {...}

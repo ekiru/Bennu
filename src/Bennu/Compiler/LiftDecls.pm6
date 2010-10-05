@@ -12,7 +12,8 @@ multi method lift-decls (Bennu::Decl::Class $class) {
     my $what = $how.new-type-object;
     die "Class traits not yet implemented."
       if $class.traits.elems;
-    $.PUSH-CLASS($what);
-    LEAVE { $.POP-CLASS }
+    $.scope-object($class.scope).assign-static($class.name, $what);
+    $.PUSH-PACKAGE($what);
+    LEAVE { $.POP-PACKAGE }
     self.lift-decls($class.body);
 }

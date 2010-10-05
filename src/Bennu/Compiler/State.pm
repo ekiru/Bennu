@@ -1,15 +1,26 @@
 use MooseX::Declare;
 
 role Bennu::Compiler::State {
-    has _STATE_CLASS => (is => 'ro', default => sub { [] });
+    use Bennu::MOP;
 
-    method CLASS () { $self->_STATE_CLASS()->[-1] }
+    has _STATE_PACKAGE =>
+      (is => 'ro',
+       default => sub { [Bennu::MOP::Package->new(name => 'GLOBAL')] });
 
-    method PUSH_CLASS ($class) {
-        push @{ $self->_STATE_CLASS() }, $class;
+    method CLASS () {
+        for my $package (@{ $self->_STATE_PACKAGE }) {
+            return $package if $package->type eq 'class';
+        }
+        die '::?CLASS not found.';
     }
 
-    method POP_CLASS () {
-        pop @{ $self->_STATE_CLASS() };
+    method PACKAGE () { $self->_STATE_PACKAGE()->[-1] }
+
+    method PUSH_PACKAGE ($class) {
+        push @{ $self->_STATE_PACKAGE() }, $class;
+    }
+
+    method POP_PACKAGE () {
+        pop @{ $self->_STATE_PACKAGE() };
     }
 }
