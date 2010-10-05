@@ -251,13 +251,11 @@ class Bennu::Actions {
     method variable($m) {
         my $ast;
         if (exists $m->{desigilname}) {
-            my $name =
-              $m->{sigil}{_ast} .
-              ($m->{twigil}[0] ?
-               $m->{twigil}[0]{_ast} :
-               '') .
-              $m->{desigilname}{_ast};
-            $ast = Bennu::AST::Lexical->new(name => $name);
+            $ast =
+              Bennu::AST::Lexical->new(desigilname => $m->{desigilname}{_ast},
+                                       sigil => $m->{sigil}{_ast});
+            $ast->twigil($m->{twigil}[0]{_ast})
+              if $m->{twigil}[0];
         }
         else {
             $m->sorry("Non-simple variables not yet implemented.");
@@ -394,7 +392,9 @@ class Bennu::Actions {
     }
 
     method infix($m) {
-        $m->{_ast} = Bennu::AST::Lexical->new(name => '&infix:<' . $m->{sym} . '>');
+        $m->{_ast} =
+          Bennu::AST::Lexical->new(desigilname => 'infix:<' . $m->{sym} . '>',
+                                   sigil => '&');
     }
     method infix__S_Plus($m) { }
 
@@ -404,13 +404,14 @@ class Bennu::Actions {
         my $ident = $m->{identifier}{_ast};
         given ($m->{identifier}->Str) {
             when ($m->is_name($m->{identifier}->Str)) {
-                $m->{_ast} = Bennu::AST::Lexical->new(name => $ident);
+                $m->{_ast} = Bennu::AST::Lexical->new(desigilname => $ident);
             }
             default {
                 my $args = $m->{args}{_ast};
                 $m->{_ast} = Bennu::AST::Call->new(function => 
-                                                   Bennu::AST::Lexical->new(name =>
-                                                                            '&' . $ident),
+                                                   Bennu::AST::Lexical->new(desigilname =>
+                                                                            $ident,
+                                                                           sigil => '&'),
                                                    args => $args);
             }
         }

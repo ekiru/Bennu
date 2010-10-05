@@ -188,11 +188,10 @@ method trait_mod($/) { }
 method variable($/) {
     my $ast;
     if $<desigilname> :exists {
-        my $name =
-          $<sigil>.ast ~
-          ($<twigil>[0]:exists ?? $<twigil>[0].ast !! '') ~
-          $<desigilname>.ast;
-        $ast = Bennu::AST::Lexical.new(:$name);
+        $ast = Bennu::AST::Lexical.new(:desigilname($<desigilname>.ast),
+                                       :sigil($<sigil>.ast));
+        $ast.twigil = $<twigil>[0].ast
+          if $<twigil>[0]:exists;
     }
     else {
         $/.sorry("Non-simple variables not yet implemented.");
@@ -327,7 +326,8 @@ method POSTFIX($/) {
 }
 
 method infix($/) {
-    make Bennu::AST::Lexical.new(name => '&infix:<' ~ $/<sym> ~ '>');
+    make Bennu::AST::Lexical.new(desigilname => 'infix:<' ~ $/<sym> ~ '>',
+                                 sigil => '&');
 }
 
 method infix:sym<+>($/) { }
@@ -337,13 +337,13 @@ method term($/) { }
 method term:sym<identifier>($/) {
     my $ident = $<identifier>.ast;
     when $/.is_name($<identifier>.Str) {
-        make Bennu::AST::Lexical.new(name => $ident);
+        make Bennu::AST::Lexical.new(desigilname => $ident);
     }
     default {
         my $args = $<args>.ast;
         make Bennu::AST::Call.new(function =>
-                                  Bennu::AST::Lexical.new(name =>
-                                                          '&' ~ $ident),
+                                  Bennu::AST::Lexical.new(desigilname => $ident,
+                                                         sigil => '&'),
                                   args => $args);
     }
 }

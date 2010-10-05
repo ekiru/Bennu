@@ -48,7 +48,9 @@ class MethodCall is Bennu::AST {
 # Lexical variable lookups
 
 class Lexical is Bennu::AST {
-    has Str $.name;
+    has Str $.desigilname;
+    has $.twigil is rw = '';
+    has $.sigil = '';
 }
 
 # Literal-ish data structures

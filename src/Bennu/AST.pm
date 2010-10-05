@@ -60,7 +60,9 @@ class Bennu::AST::MethodCall is Bennu::AST {
 # Lexical variable lookups
 
 class Bennu::AST::Lexical is Bennu::AST {
-    has name => (is => 'ro', isa => 'Str');
+    has desigilname => (is => 'ro', isa => 'Str');
+    has sigil => (is => 'ro', default => '');
+    has twigil => (is => 'rw', default => '');
 }
 
 # Literal-ish data structures
