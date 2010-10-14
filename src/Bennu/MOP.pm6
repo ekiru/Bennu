@@ -23,13 +23,18 @@ class ClassWHAT is Package {
 }
 
 class ClassHOW is Mu {
-    has $.name is rw;
+    has $!name is rw;
+    has @!attributes;
 
     method new-type-object {
         ClassWHAT.new(:how(self), :$.name);
     }
 
-    method add-attribute($obj, $attribute) {...}
+    method add-attribute($obj, $attribute) {
+        return $obj.how.add-attribute($obj, $attribute)
+          unless $obj.how eqv self;
+        @.attributes.push($attribute);
+    }
 }
 
 class Attribute is Mu {

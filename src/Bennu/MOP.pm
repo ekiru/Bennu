@@ -23,13 +23,19 @@ class Bennu::MOP::ClassWHAT extends Bennu::MOP::Package {
 }
 
 class Bennu::MOP::ClassHOW extends Bennu::MOP::Mu {
-    has name => (is => 'rw');
+    has _name => (is => 'rw', init_arg => 'name');
+    has _attributes => (is => 'ro', init_arg => 'attributes',
+                       default => sub { [] });
 
     method new_type_object() {
-        Bennu::MOP::ClassWHAT->new(how => $self, name => $self->name);
+        Bennu::MOP::ClassWHAT->new(how => $self, name => $self->_name);
     }
 
-    method add_attribute($obj, $attribute) {...}
+    method add_attribute($obj, $attribute) {
+        return $obj->how->add_attribute($obj, $attribute)
+          unless $obj->how == $self;
+        push @{ $self->_attributes }, $attribute;
+    }
 }
 
 class Bennu::MOP::Attribute is Bennu::MOP::Mu {
