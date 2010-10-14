@@ -33,6 +33,10 @@ class Labelled is Bennu::AST {
     has $.statement;
 }
 
+class Noop is Bennu::AST {
+
+}
+
 # Compound expression ASTs
 
 class Call is Bennu::AST {

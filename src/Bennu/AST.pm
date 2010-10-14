@@ -41,6 +41,10 @@ class Bennu::AST::Labelled is Bennu::AST {
     has statement => (is => 'ro');
 }
 
+class Bennu::AST::Noop is Bennu::AST {
+
+}
+
 # Compound expression ASTs
 
 class Bennu::AST::Call is Bennu::AST {
