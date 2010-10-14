@@ -1,7 +1,18 @@
 role Bennu::Compiler::LiftDecls;
 
+use Bennu::AST;
 use Bennu::Decl;
 use Bennu::MOP;
+
+multi method scope-object('has') { $.CLASS }
+
+multi method scope-object('our') {
+    $.PACKAGE;
+}
+
+multi method scope-object($scope) {
+    die "No scope object for '$scope' scope.";
+}
 
 multi method lift-decls ($ast) {
     $ast.walk({ self.lift-decls($_) });
@@ -16,4 +27,19 @@ multi method lift-decls (Bennu::Decl::Class $class) {
     $.PUSH-PACKAGE($what);
     LEAVE { $.POP-PACKAGE }
     self.lift-decls($class.body);
+}
+
+multi method lift-decls (Bennu::Decl::Variable $variable) {
+    die "Variable traits not yet implemented."
+      if $variable.traits.elems;
+    if ($variable.scope eq 'has') {
+        die "Lexical aliases for private variables not twr implemented."
+          unless $variable.twigil eq '.'|'!';
+        my $WHAT = $.scope-object($variable.scope);
+        $WHAT.how.add-attribute($WHAT, $variable.Attribute);
+        return Bennu::AST::Noop.new; # This might be wrong.
+    }
+    else {
+        die "Not yet implemented variable type.";
+    }
 }

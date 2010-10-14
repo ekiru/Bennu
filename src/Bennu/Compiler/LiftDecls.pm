@@ -4,16 +4,20 @@ use 5.010;
 role Bennu::Compiler::LiftDecls {
     use MooseX::MultiMethods;
 
-    use Bennu::Decl qw(ClassDecl);
+    use Bennu::AST;
+    use Bennu::Decl qw(ClassDecl VariableDecl);
     use Bennu::MOP;
 
     method scope_object ($scope) {
         given ($scope) {
+            when ('has') {
+                return $self->CLASS;
+            }
             when ('our') {
                 return $self->PACKAGE;
             }
             default {
-                die "No scope object for scope $scope."
+                die "No scope object for '$scope' scope."
             }
         }
     }
@@ -32,5 +36,21 @@ role Bennu::Compiler::LiftDecls {
         my $ast = $self->lift_decls($class->body);
         $self->POP_PACKAGE;
         $ast;
+    }
+
+    multi method lift_decls(VariableDecl $variable) {
+        die "Variable traits not yet implemented."
+          if scalar @{ $variable->traits };
+        if ($variable->scope eq 'has') {
+            die "Lexical aliases for private variables not twr implemented."
+              unless $variable->twigil ~~ ['.', '!'];
+            my $WHAT = $self->scope_object($variable->scope);
+            my $attribute = $variable->Attribute;
+            $WHAT->how->add_attribute($WHAT, $attribute);
+            return Bennu::AST::Noop->new;
+        }
+        else {
+            die "Not yet implemented variable type.";
+        }
     }
 }
