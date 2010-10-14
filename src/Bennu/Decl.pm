@@ -1,9 +1,11 @@
 use MooseX::Declare;
 
 class Bennu::Decl {
-    use MooseX::Types -declare => [qw(ClassDecl)];
+    use MooseX::Types -declare => [qw(ClassDecl VariableDecl)];
 
     class_type ClassDecl, { class => 'Bennu::Decl::Class' };
+
+    class_type VariableDecl, { class => 'Bennu::Decl::Variable' };
 
     has scope => (is => 'rw', builder => '_build_scope');
 }
@@ -27,7 +29,7 @@ class Bennu::Decl::Method extends Bennu::Decl {
 }
 
 class Bennu::Decl::Variable extends Bennu::Decl {
-    has variable => (is => 'ro');
+    has variable => (is => 'ro', handles => [qw(desigilname sigil twigil)]);
     has traits => (is => 'ro', default => sub { [] });
     has constraints => (is => 'ro', default => sub { [] });
 

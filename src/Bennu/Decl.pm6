@@ -20,7 +20,7 @@ class Method is Bennu::Decl {
 }
 
 class Variable is Bennu::Decl {
-  has $.variable;
+  has $.variable handles <desigilname sigil twigil>;
   has @.traits;
   has @.constraints; # type constraints
 
