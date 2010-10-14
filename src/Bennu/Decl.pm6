@@ -20,13 +20,23 @@ class Method is Bennu::Decl {
 }
 
 class Variable is Bennu::Decl {
-  has $.variable handles <desigilname sigil twigil>;
-  has @.traits;
-  has @.constraints; # type constraints
+    use Bennu::MOP;
 
-  submethod BUILD (:$.scope = 'my') { }
+    has $.variable handles <desigilname sigil twigil>;
+    has @.traits;
+    has @.constraints; # type constraints
 
-  method add-constraint ($constraint) {
-      @.constraints.push($constraint);
-  }
+    submethod BUILD (:$.scope = 'my') { }
+
+    method add-constraint ($constraint) {
+        @.constraints.push($constraint);
+    }
+
+    method Attribute {
+        my $private = $.twigil ne '.';
+        Bennu::MOP::Attribute.new(:name($.desigilname),
+                                  :$private,
+                                  :@.constraints,
+                                  :@.traits);
+    }
 }

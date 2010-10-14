@@ -29,6 +29,8 @@ class Bennu::Decl::Method extends Bennu::Decl {
 }
 
 class Bennu::Decl::Variable extends Bennu::Decl {
+    use Bennu::MOP;
+
     has variable => (is => 'ro', handles => [qw(desigilname sigil twigil)]);
     has traits => (is => 'ro', default => sub { [] });
     has constraints => (is => 'ro', default => sub { [] });
@@ -37,5 +39,12 @@ class Bennu::Decl::Variable extends Bennu::Decl {
 
     method add_constraint ($constraint) {
         push @{ $self->constraints }, $constraint;
+    }
+
+    method Attribute {
+        Bennu::MOP::Attribute->new(name => $self->desigilname,
+                                   private => $self->twigil ne '.',
+                                   constraints => $self->constraints,
+                                   traits => $self->traits);
     }
 }
