@@ -9,6 +9,8 @@ class Package is Mu {
     has %!static-definitions;
     has %!static-names;
 
+    method type { 'package' }
+
     method assign-static($name, $value) {
         %!static-names{$name} = 1;
         %!static-definitions{$name} = $value;
@@ -28,4 +30,11 @@ class ClassHOW is Mu {
     }
 
     method add-attribute($obj, $attribute) {...}
+}
+
+class Attribute is Mu {
+    has $.name;
+    has Bool $.private;
+    has @.constraints;
+    has @.traits;
 }
