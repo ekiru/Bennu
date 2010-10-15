@@ -17,6 +17,11 @@ class Method is Bennu::Decl {
     submethod BUILD (:$.scope = 'has') { }
 
     method default_signature { return; }
+
+    method Method {
+         # Don't initialize body because it has to be lift-decl'ed first.
+        Bennu::MOP::Method.new(:$.name, :@.traits);
+    }
 }
 
 class Variable is Bennu::Decl {

@@ -1,10 +1,10 @@
 use MooseX::Declare;
 
 class Bennu::Decl {
-    use MooseX::Types -declare => [qw(ClassDecl VariableDecl)];
+    use MooseX::Types -declare => [qw(ClassDecl MethodDecl VariableDecl)];
 
     class_type ClassDecl, { class => 'Bennu::Decl::Class' };
-
+    class_type MethodDecl, { class => 'Bennu::Decl::Method' };
     class_type VariableDecl, { class => 'Bennu::Decl::Variable' };
 
     has scope => (is => 'rw', builder => '_build_scope');
@@ -26,6 +26,11 @@ class Bennu::Decl::Method extends Bennu::Decl {
     method _build_scope () { 'has' }
 
     method default_signature ($class:) { return; }
+
+    method Method {
+        # Don't initialize body because it has to be lift-decl'ed first.
+        Bennu::MOP::Method->new(name => $self->name, traits => $self->traits);
+    }
 }
 
 class Bennu::Decl::Variable extends Bennu::Decl {
