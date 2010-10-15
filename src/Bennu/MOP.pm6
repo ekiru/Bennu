@@ -43,3 +43,9 @@ class Attribute is Mu {
     has @.constraints;
     has @.traits;
 }
+
+class Method is Mu {
+    has $.name;
+    has $.body is rw;
+    has @.traits;
+}

@@ -38,9 +38,15 @@ class Bennu::MOP::ClassHOW extends Bennu::MOP::Mu {
     }
 }
 
-class Bennu::MOP::Attribute is Bennu::MOP::Mu {
+class Bennu::MOP::Attribute extends Bennu::MOP::Mu {
     has name => (is => 'ro');
     has private => (is => 'ro', isa => 'Bool');
     has constraints => (is => 'ro', default => sub { [] });
+    has traits => (is => 'ro', default => sub { [] });
+}
+
+class Bennu::MOP::Method extends Bennu::MOP::Mu {
+    has name => (is => 'ro');
+    has body => (is => 'rw');
     has traits => (is => 'ro', default => sub { [] });
 }
