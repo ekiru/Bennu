@@ -4,6 +4,10 @@ class Bennu::MOP::Mu {
     has how => (is => 'rw');
 }
 
+class Bennu::MOP::Scope extends Bennu::MOP::Mu {
+
+}
+
 class Bennu::MOP::Package extends Bennu::MOP::Mu {
     has name => (is => 'ro');
     has static_definitions => (is => 'ro', default => sub { {} });
@@ -26,6 +30,8 @@ class Bennu::MOP::ClassHOW extends Bennu::MOP::Mu {
     has _name => (is => 'rw', init_arg => 'name');
     has _attributes => (is => 'ro', init_arg => 'attributes',
                        default => sub { [] });
+    has _methods => (is => 'ro', init_arg => 'methods',
+                     default => sub { [] });
 
     method new_type_object() {
         Bennu::MOP::ClassWHAT->new(how => $self, name => $self->_name);
@@ -36,6 +42,12 @@ class Bennu::MOP::ClassHOW extends Bennu::MOP::Mu {
           unless $obj->how == $self;
         push @{ $self->_attributes }, $attribute;
     }
+
+    method add_method($obj, $method) {
+        return $obj->how->add_method($obj, $method)
+          unless $obj->how == $self;
+        push @{ $self->_methods }, $method;
+    }
 }
 
 class Bennu::MOP::Attribute extends Bennu::MOP::Mu {
@@ -45,7 +57,7 @@ class Bennu::MOP::Attribute extends Bennu::MOP::Mu {
     has traits => (is => 'ro', default => sub { [] });
 }
 
-class Bennu::MOP::Method extends Bennu::MOP::Mu {
+class Bennu::MOP::Method extends Bennu::MOP::Scope {
     has name => (is => 'ro');
     has body => (is => 'rw');
     has traits => (is => 'ro', default => sub { [] });

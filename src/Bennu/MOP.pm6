@@ -4,6 +4,9 @@ class Mu {
     has $.how is rw;
 }
 
+class Scope is Mu {
+}
+
 class Package is Mu {
     has $.name;
     has %!static-definitions;
@@ -25,6 +28,7 @@ class ClassWHAT is Package {
 class ClassHOW is Mu {
     has $!name is rw;
     has @!attributes;
+    has @!methods;
 
     method new-type-object {
         ClassWHAT.new(:how(self), :$.name);
@@ -35,6 +39,12 @@ class ClassHOW is Mu {
           unless $obj.how eqv self;
         @.attributes.push($attribute);
     }
+
+    method add-method($obj, $method) {
+        return $obj.how.add-method($obj, method)
+          unless $obj.how eqv self;
+        @.methods.push($methods);
+    }
 }
 
 class Attribute is Mu {
@@ -44,7 +54,7 @@ class Attribute is Mu {
     has @.traits;
 }
 
-class Method is Mu {
+class Method is Scope {
     has $.name;
     has $.body is rw;
     has @.traits;
