@@ -29,6 +29,20 @@ multi method lift-decls (Bennu::Decl::Class $class) {
     self.lift-decls($class.body);
 }
 
+multi method lift-decls (Bennu::Decl::Method $meth-decl) {
+    die "Method traits not yet implemented."
+      if $meth_decl.traits.elems;
+    die "Non-has-scoped methods not yet implemented."
+      unless $meth_decl.scope eq 'has';
+    my $method = $meth-decl.Method;
+    my $WHAT = $.scope-object('has');
+    $WHAT.how.add-method($WHAT, $method);
+    $.PUSH-SCOPE($method);
+    LEAVE { $.POP-SCOPE }
+    $method.body = $.lift-decls($meth-decl.body);
+    $method;
+}
+
 multi method lift-decls (Bennu::Decl::Variable $variable) {
     die "Variable traits not yet implemented."
       if $variable.traits.elems;

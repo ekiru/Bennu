@@ -5,7 +5,7 @@ role Bennu::Compiler::LiftDecls {
     use MooseX::MultiMethods;
 
     use Bennu::AST;
-    use Bennu::Decl qw(ClassDecl VariableDecl);
+    use Bennu::Decl qw(ClassDecl MethodDecl VariableDecl);
     use Bennu::MOP;
 
     method scope_object ($scope) {
@@ -36,6 +36,20 @@ role Bennu::Compiler::LiftDecls {
         my $ast = $self->lift_decls($class->body);
         $self->POP_PACKAGE;
         $ast;
+    }
+
+    multi method lift_decls (MethodDecl $meth_decl) {
+        die "Method traits not yet implemented."
+          if scalar @{ $meth_decl->traits };
+        die "Non-has-scoped methods not yet implemented."
+          unless $meth_decl->scope eq 'has';
+        my $method = $meth_decl->Method;
+        my $WHAT = $self->scope_object('has');
+        $WHAT->how->add_method($WHAT, $method);
+        $self->PUSH_SCOPE($method);
+        $method->body($self->lift_decls($meth_decl->body));
+        $self->POP_SCOPE;
+        $method;
     }
 
     multi method lift_decls(VariableDecl $variable) {
