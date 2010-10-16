@@ -70,6 +70,13 @@ class Bennu::AST::MethodCall is Bennu::AST {
     method unshift($arg) {
         unshift @{$self->args}, $arg;
     }
+
+    method walk($cb) {
+        for (@{ $self->args }) {
+            $_ = $cb->($_);
+        }
+        $self;
+    }
 }
 
 # Lexical variable lookups

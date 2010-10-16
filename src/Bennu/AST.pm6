@@ -58,6 +58,13 @@ class Call is Bennu::AST {
 class MethodCall is Bennu::AST {
     has $.name;
     has @.args handles <unshift>;
+
+    method walk (&cb) {
+        for @.args -> $arg is rw {
+            $arg .= &cb;
+        }
+        self;
+    }
 }
 
 # Lexical variable lookups
