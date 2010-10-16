@@ -27,6 +27,17 @@ class Conditional is Bennu::AST {
     has @.conditions;
     has @.blocks;
     has $.otherwise is rw;
+
+    method walk (&cb) {
+        for @.conditions -> $condition is rw {
+            $condition .= &cb;
+        }
+        for @.blocks -> $block is rw {
+            $block .= &cb;
+        }
+        $.otherwise .= &cb;
+        self;
+    }
 }
 
 class Labelled is Bennu::AST {

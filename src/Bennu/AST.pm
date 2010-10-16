@@ -32,9 +32,20 @@ class Bennu::AST::StatementList is Bennu::AST {
 }
 
 class Bennu::AST::Conditional is Bennu::AST {
-    has conditionals => (is => 'ro', default => sub { [] });
+    has conditions => (is => 'ro', default => sub { [] });
     has blocks => (is => 'ro', default => sub { [] });
     has otherwise => (is => 'rw');
+
+    method walk($cb) {
+        for (@{ $self->conditions }) {
+            $_ = $cb->($_);
+        }
+        for (@{ $self->blocks }) {
+            $_ = $cb->($_);
+        }
+        $self->otherwise($cb->($self->otherwise));
+        $self;
+    }
 }
 
 class Bennu::AST::Labelled is Bennu::AST {
