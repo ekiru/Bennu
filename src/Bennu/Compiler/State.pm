@@ -6,6 +6,11 @@ role Bennu::Compiler::State {
     has _STATE_PACKAGE =>
       (is => 'ro',
        default => sub { [Bennu::MOP::Package->new(name => 'GLOBAL')] });
+    has _STATE_SCOPE =>
+      (is => 'ro', lazy => 1,
+       default => method () {
+           [Bennu::MOP::Scope->new(outer => $self->_STATE_PACKAGE->[0])];
+       });
 
     method CLASS () {
         for my $package (@{ $self->_STATE_PACKAGE }) {
@@ -22,5 +27,13 @@ role Bennu::Compiler::State {
 
     method POP_PACKAGE () {
         pop @{ $self->_STATE_PACKAGE() };
+    }
+
+    method PUSH_SCOPE ($class) {
+        push @{ $self->_STATE_SCOPE() }, $class;
+    }
+
+    method POP_SCOPE () {
+        pop @{ $self->_STATE_SCOPE() };
     }
 }

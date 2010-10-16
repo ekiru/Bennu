@@ -2,7 +2,13 @@ role Bennu::Compiler::State;
 
 use Bennu::MOP;
 
-my @!PACKAGE = Bennu::MOP::Package.new(:name<GLOBAL>);
+my @!PACKAGE;
+my @!SCOPE;
+
+submethod BUILD () {
+    @!PACKAGE = Bennu::MOP::Package.new(:name<GLOBAL>)
+    @!SCOPE = Bennu::MOP::Scope.new(:outer(@!PACKAGE[0]));
+}
 
 method CLASS {
     for @!PACKAGE -> $package {
@@ -19,6 +25,14 @@ method PUSH-PACKAGE ($package) {
     @!PACKAGE.push($package);
 }
 
-method POP-PACKAGES {
+method POP-PACKAGE {
     @!PACKAGE.pop;
+}
+
+method PUSH-SCOPE ($scope) {
+    @!SCOPE.push($scope);
+}
+
+method POP-SCOPE {
+    @!SCOPE.pop;
 }
