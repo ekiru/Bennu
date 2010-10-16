@@ -85,6 +85,10 @@ class Bennu::AST::Lexical is Bennu::AST {
     has desigilname => (is => 'ro', isa => 'Str');
     has sigil => (is => 'ro', default => '');
     has twigil => (is => 'rw', default => '');
+
+    method walk ($cb) {
+        $self;
+    }
 }
 
 # Literal-ish data structures

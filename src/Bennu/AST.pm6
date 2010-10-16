@@ -73,6 +73,10 @@ class Lexical is Bennu::AST {
     has Str $.desigilname;
     has $.twigil is rw = '';
     has $.sigil = '';
+
+    method walk (&cb) {
+        self;
+    }
 }
 
 # Literal-ish data structures
