@@ -1,11 +1,21 @@
 #!/usr/bin/env perl
 use lib 'src';
 use 5.010;
+use strict;
+use warnings;
 
 use Bennu::Compiler;
 use Data::Dumper;
 
-say Dumper(Bennu::Compiler->new->compilefile($ARGV[0]));
+my $compiler = Bennu::Compiler->new;
+
+my $ast = $compiler->compilefile($ARGV[0]);
+my $packages = $compiler->PACKAGE;
+my $lex = $compiler->SCOPE;
+
+say Dumper $ast;
+say Dumper $packages;
+say Dumper $lex;
 
 # Local Variables:
 #   mode: cperl

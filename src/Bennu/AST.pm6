@@ -1,5 +1,11 @@
 class Bennu::AST;
 
+role IdWalk {
+    method walk (&cb) {
+        self;
+    }
+}
+
 class CompilationUnit is Bennu::AST {
     has $.statementlist handles <walk>;
 }
@@ -8,6 +14,11 @@ class CompilationUnit is Bennu::AST {
 
 class Block is Bennu::AST {
     has $.body;
+
+    method walk (&cb) {
+        $!body .= &cb;
+        self;
+    }
 }
 
 # Statement-ish ASTS
@@ -53,6 +64,14 @@ class Noop is Bennu::AST {
 class Call is Bennu::AST {
     has $.function;
     has @.args;
+
+    method walk (&cb) {
+        $!function .= &cb;
+        for @!args -> $arg is rw {
+            $arg .= &cb;
+        }
+        self;
+    }
 }
 
 class MethodCall is Bennu::AST {
@@ -69,14 +88,10 @@ class MethodCall is Bennu::AST {
 
 # Lexical variable lookups
 
-class Lexical is Bennu::AST {
+class Lexical is Bennu::AST does IdWalk {
     has Str $.desigilname;
     has $.twigil is rw = '';
     has $.sigil = '';
-
-    method walk (&cb) {
-        self;
-    }
 }
 
 # Literal-ish data structures
@@ -87,7 +102,7 @@ class Parcel is Bennu::AST {
 
 # Numbers
 
-class Integer is Bennu::AST {
+class Integer is Bennu::AST does IdWalk {
     has Int $.value;
 }
 

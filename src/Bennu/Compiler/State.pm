@@ -29,6 +29,8 @@ role Bennu::Compiler::State {
         pop @{ $self->_STATE_PACKAGE() };
     }
 
+    method SCOPE () { $self->_STATE_SCOPE()->[-1] }
+
     method PUSH_SCOPE ($class) {
         push @{ $self->_STATE_SCOPE() }, $class;
     }

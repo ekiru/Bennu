@@ -4,6 +4,12 @@ class Bennu::AST {
 
 }
 
+role Bennu::AST::IdWalk {
+    method walk ($cb) {
+        $self;
+    }
+}
+
 class Bennu::AST::CompilationUnit is Bennu::AST {
     has statementlist => (is => 'ro', handles => [qw(walk)]);
 }
@@ -11,7 +17,12 @@ class Bennu::AST::CompilationUnit is Bennu::AST {
 # Blocky ASTs
 
 class Bennu::AST::Block is Bennu::AST {
-    has body => (is => 'ro');
+    has body => (is => 'ro', writer => '_set_body');
+
+    method walk($cb) {
+        $self->_set_body($cb->($self->body));
+        $self;
+    }
 }
 
 # Statement-ish ASTS
@@ -59,8 +70,16 @@ class Bennu::AST::Noop is Bennu::AST {
 # Compound expression ASTs
 
 class Bennu::AST::Call is Bennu::AST {
-    has function => (is => 'ro');
+    has function => (is => 'ro', writer => '_set_function');
     has args => (is => 'ro', default => sub { [] });
+
+    method walk($cb) {
+        $self->_set_function($cb->($self->function));
+        for (@{ $self->args }) {
+            $_ = $cb->($_);
+        }
+        $self;
+    }
 }
 
 class Bennu::AST::MethodCall is Bennu::AST {
@@ -81,7 +100,7 @@ class Bennu::AST::MethodCall is Bennu::AST {
 
 # Lexical variable lookups
 
-class Bennu::AST::Lexical is Bennu::AST {
+class Bennu::AST::Lexical is Bennu::AST with Bennu::AST::IdWalk {
     has desigilname => (is => 'ro', isa => 'Str');
     has sigil => (is => 'ro', default => '');
     has twigil => (is => 'rw', default => '');
@@ -99,7 +118,7 @@ class Bennu::AST::Parcel is Bennu::AST {
 
 # Numbers
 
-class Bennu::AST::Integer is Bennu::AST {
+class Bennu::AST::Integer is Bennu::AST with Bennu::AST::IdWalk {
     has value => (is => 'ro', isa => 'Int');
 }
 

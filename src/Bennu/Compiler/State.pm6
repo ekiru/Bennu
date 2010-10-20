@@ -29,6 +29,10 @@ method POP-PACKAGE {
     @!PACKAGE.pop;
 }
 
+method SCOPE ($scope) {
+    @!SCOPE[*-1];
+}
+
 method PUSH-SCOPE ($scope) {
     @!SCOPE.push($scope);
 }
