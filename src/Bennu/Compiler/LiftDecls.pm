@@ -58,8 +58,9 @@ role Bennu::Compiler::LiftDecls {
 
         # Set up the type-object and the package in the scope.
         $self->scope_object($class->scope)->assign_static($class->name, $what);
-        my $package_name = $class->name . '::';
-        $self->scope_object($class->scope)->assign_static($package_name, $who);
+        my @package_name = @{ $class->name };
+        $package_name[-1] .= '::';
+        $self->scope_object($class->scope)->assign_static(\@package_name, $who);
 
         # Walk the children.
         $self->PUSH_CLASS($what);

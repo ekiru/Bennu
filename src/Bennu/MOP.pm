@@ -18,8 +18,18 @@ class Bennu::MOP::Package extends Bennu::MOP::Mu {
     method type { 'package' }
 
     method assign_static($name, $value) {
-        $self->static_names->{$name} = 1;
-        $self->static_definitions->{$name} = $value;
+        if (@$name == 1) {
+            $self->static_names->{$name->[0]} = 1;
+            $self->static_definitions->{$name->[0]} = $value;
+        } elsif (exists $self->static_definitions->{$name->[0]}) {
+            my $child = $self->static_definitions->{$name->[0]};
+            my $name_length = scalar @$name;
+            my @remaining = $name->[1 .. $name_length - 1];
+            $child->assign_static(\@remaining, $value);
+        } else {
+            die "Attempted to assign to non-existent package " .
+              $self->name . '::' . $name->[0] . ".";
+        }
     }
 }
 

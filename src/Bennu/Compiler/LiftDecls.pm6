@@ -50,8 +50,9 @@ multi method lift-decls (Bennu::Decl::Class $class) {
 
     # Set up the type-object and the package in the scope.
     $.scope-object($class.scope).assign-static($class.name, $what);
-    my $package-name = $class.name ~ '::';
-    $.scope-object($class.scope).assign-static($package-name, $who);
+    my @package-name = $class.name.flat;
+    @package-name[*-1] ~= '::';
+    $.scope-object($class.scope).assign-static(@package-name, $who);
 
     # Walk the children.
     $.PUSH-CLASS($what);

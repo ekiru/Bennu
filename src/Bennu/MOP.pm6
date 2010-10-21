@@ -17,9 +17,17 @@ class Package is Mu {
 
     method type { 'package' }
 
-    method assign-static($name, $value) {
-        %!static-names{$name} = 1;
-        %!static-definitions{$name} = $value;
+    method assign-static(@name, $value) {
+        if @name == 1 {
+            %!static-names{@name[0]} = 1;
+            %!static-definitions{@name[0]} = $value;
+        } elsif %!static-definitions{@name[0]} :exists {
+            my $child = %!static-definitions{@name[0]};
+            $child.assign-static(@name[1 .. *-1], $value);
+        } else {
+            die "Attempted to assign to non-existent package " ~
+              $.name ~ '::' ~ @name[0] ~ ".";
+        }
     }
 }
 
