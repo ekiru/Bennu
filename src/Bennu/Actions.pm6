@@ -40,6 +40,8 @@ method infixstopper($/) { }
 
 method curlycheck($/) { }
 
+method apostrophe($/) { }
+
 method ident($/) {
     make ~$/;
 }
@@ -56,10 +58,19 @@ method longname($/) {
 }
 
 method name($/) {
-    if $<morename>.elems {
-        $/.sorry("Package-qualified names not yet implemented.");
+    my @names = $<identifer>.ast;
+    for $<morename>.>>.ast -> $name {
+        @names.push($name);
     }
-    make $<identifier>.ast;
+    make @names;
+}
+
+method morename($/) {
+    if $<EXPR>.elems {
+        $/.sorry("Indirect names not yet implemented.");
+        return;
+    }
+    make $<identifier>[0].ast;
 }
 
 method scope_declarator($/) { }
@@ -184,6 +195,26 @@ method trait($/) {
 }
 
 method trait_mod($/) { }
+
+method trait_mod:sym<is>($/) {
+    if $<circumfix>.elems {
+        $/.sorry("Postcircumfixes in traits not yet implemented.");
+        return;
+    }
+    my $name = $<longname>.ast;
+    if $name[0] eq 'bennu' {
+        given $name[1] {
+            when 'll-class' {
+                make Bennu::Decl::LLClassTrait.new;
+            }
+            default {
+                $/.sorry("Unrecognized bennu::$_ trait.");
+            }
+        }
+    } else {
+        $/.sorry("Non-bootstrap traits not yet implemented.");
+    }
+}
 
 method variable($/) {
     my $ast;

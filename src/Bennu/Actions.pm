@@ -93,6 +93,8 @@ class Bennu::Actions {
 
     method curlycheck($m) { }
 
+    method apostrophe($m) { }
+
     method ident($m) {
         $m->{_ast} = $m->Str;
     }
@@ -109,10 +111,19 @@ class Bennu::Actions {
     }
 
     method name($m) {
-        if (@{$m->{morename}}) {
-            $m->sorry("Package-qualified names not yet implemented.");
+        my @names = $m->{identifier}{_ast};
+        for my $name (map { $_->{_ast} } @{ $m->{morename} }) {
+            push @names, $name;
         }
-        $m->{_ast} = $m->{identifier}{_ast};
+        $m->{_ast} = \@names;
+    }
+
+    method morename($m) {
+        if (scalar @{ $m->{EXPR} }) {
+            $m->sorry("Indirect names not yet implemented.");
+            return;
+        }
+        $m->{_ast} = $m->{identifier}[0]{_ast};
     }
 
     method scope_declarator($m) { }
@@ -247,6 +258,26 @@ class Bennu::Actions {
     }
 
     method trait_mod($m) { }
+
+    method trait_mod__S_is($m) {
+        if (scalar @{ $m->{circumfix} }) {
+            $m->sorry("Postcircumfixes in traits not yet implemented.");
+            return;
+        }
+        my $name = $m->{longname}{_ast};
+        if ($name->[0] eq 'bennu') {
+            given ($name->[1]) {
+                when ('ll-class') {
+                    $m->{_ast} = Bennu::Decl::LLClassTrait->new;
+                }
+                default {
+                    $m->sorry("Unrecognized bennu::$_ trait.");
+                }
+            }
+        } else {
+            $m->sorry("Non-bootstrap traits not yet implemented.");
+        }
+    }
 
     method variable($m) {
         my $ast;

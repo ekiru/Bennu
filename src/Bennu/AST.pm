@@ -101,7 +101,7 @@ class Bennu::AST::MethodCall is Bennu::AST {
 # Lexical variable lookups
 
 class Bennu::AST::Lexical is Bennu::AST with Bennu::AST::IdWalk {
-    has desigilname => (is => 'ro', isa => 'Str');
+    has desigilname => (is => 'ro');
     has sigil => (is => 'ro', default => '');
     has twigil => (is => 'rw', default => '');
 

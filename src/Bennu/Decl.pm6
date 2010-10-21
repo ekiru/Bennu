@@ -6,8 +6,9 @@ class Class is Bennu::Decl {
     has $.name;
     has $.body;
     has @.traits;
+    has Bool $.ll-class
 
-    submethod BUILD (:$.scope = 'our') { }
+    submethod BUILD (:$.scope = 'our', $!ll-class = False) { }
 }
 class Method is Bennu::Decl {
     has $.name;
@@ -43,5 +44,18 @@ class Variable is Bennu::Decl {
                                   :$private,
                                   :@.constraints,
                                   :@.traits);
+    }
+}
+
+# Bennu::Decl::Trait is used to handle traits that must be processed
+# prior to the declaration-lifting stage.
+class Trait {
+    method apply($obj) {...}
+}
+
+class LLClassTrait is Trait {
+    method apply($class) {
+        $class.ll-class = True;
+        $class;
     }
 }

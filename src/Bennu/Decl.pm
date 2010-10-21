@@ -14,6 +14,7 @@ class Bennu::Decl::Class extends Bennu::Decl {
     has name => (is => 'ro');
     has body => (is => 'ro');
     has traits => (is => 'ro', default => sub { [] });
+    has ll_class => (is => 'rw', isa => 'Bool', default => 0);
 
     method _build_scope () { 'our' }
 }
@@ -51,5 +52,20 @@ class Bennu::Decl::Variable extends Bennu::Decl {
                                    private => $self->twigil ne '.',
                                    constraints => $self->constraints,
                                    traits => $self->traits);
+    }
+}
+
+# Bennu::Decl::Trait is used to handle traits that must be processed
+# prior to the declaration-lifting stage.
+class Bennu::Decl::Trait {
+    method apply($obj) {
+        ...;
+    }
+}
+
+class Bennu::Decl::LLClassTrait extends Bennu::Decl::Trait {
+    method apply($class) {
+        $class->ll_class(1);
+        $class;
     }
 }

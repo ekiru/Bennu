@@ -89,7 +89,7 @@ class MethodCall is Bennu::AST {
 # Lexical variable lookups
 
 class Lexical is Bennu::AST does IdWalk {
-    has Str $.desigilname;
+    has $.desigilname;
     has $.twigil is rw = '';
     has $.sigil = '';
 }
