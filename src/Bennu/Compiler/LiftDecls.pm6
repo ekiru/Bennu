@@ -23,11 +23,16 @@ multi method lift-decls (Bennu::Decl::Class $class) {
     my $what = $how.new-type-object;
     my $who = Bennu::MOP::Package.new(:name($class.name));
     $what.who = $who;
+
     die "Class traits not yet implemented."
       if $class.traits.elems;
+
+    # Set up the type-object and the package in the scope.
     $.scope-object($class.scope).assign-static($class.name, $what);
     my $package-name = $class.name ~ '::';
     $.scope-object($class.scope).assign-static($package-name, $who);
+
+    # Walk the children.
     $.PUSH-CLASS($what);
     $.PUSH-PACKAGE($who);
     LEAVE { $.POP-CLASS; $.POP-PACKAGE; }

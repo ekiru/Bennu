@@ -31,11 +31,16 @@ role Bennu::Compiler::LiftDecls {
         my $what = $how->new_type_object;
         my $who = Bennu::MOP::Package->new(name => $class->name);
         $what->who($who);
+
         die "Class traits not yet implemented."
           if scalar @{ $class->traits };
+
+        # Set up the type-object and the package in the scope.
         $self->scope_object($class->scope)->assign_static($class->name, $what);
         my $package_name = $class->name . '::';
         $self->scope_object($class->scope)->assign_static($package_name, $who);
+
+        # Walk the children.
         $self->PUSH_CLASS($what);
         $self->PUSH_PACKAGE($what->who);
         my $ast = $self->lift_decls($class->body);
