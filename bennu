@@ -13,9 +13,7 @@ my $ast = $compiler->compilefile($ARGV[0]);
 my $packages = $compiler->PACKAGE;
 my $lex = $compiler->SCOPE;
 
-say Dumper $ast;
-say Dumper $packages;
-say Dumper $lex;
+say Dumper $ast, $packages, $lex;
 
 # Local Variables:
 #   mode: cperl

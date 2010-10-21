@@ -2,10 +2,12 @@ use MooseX::Declare;
 
 class Bennu::MOP::Mu {
     has how => (is => 'rw');
+    has who => (is => 'rw');
+    has defined => (is => 'rw');
 }
 
 class Bennu::MOP::Scope extends Bennu::MOP::Mu {
-
+    has outer => (is => 'ro');
 }
 
 class Bennu::MOP::Package extends Bennu::MOP::Mu {
@@ -21,9 +23,7 @@ class Bennu::MOP::Package extends Bennu::MOP::Mu {
     }
 }
 
-class Bennu::MOP::ClassWHAT extends Bennu::MOP::Package {
-    method defined() { 0 }
-    method type() { 'class' }
+class Bennu::MOP::ClassWHAT extends Bennu::MOP::Mu {
 }
 
 class Bennu::MOP::ClassHOW extends Bennu::MOP::Mu {
@@ -34,7 +34,7 @@ class Bennu::MOP::ClassHOW extends Bennu::MOP::Mu {
                      default => sub { [] });
 
     method new_type_object() {
-        Bennu::MOP::ClassWHAT->new(how => $self, name => $self->_name);
+        Bennu::MOP::ClassWHAT->new(how => $self, defined => 0);
     }
 
     method add_attribute($obj, $attribute) {

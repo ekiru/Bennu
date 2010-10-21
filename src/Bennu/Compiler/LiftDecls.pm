@@ -29,11 +29,17 @@ role Bennu::Compiler::LiftDecls {
     multi method lift_decls(ClassDecl $class) {
         my $how = Bennu::MOP::ClassHOW->new(name => $class->name);
         my $what = $how->new_type_object;
+        my $who = Bennu::MOP::Package->new(name => $class->name);
+        $what->who($who);
         die "Class traits not yet implemented."
           if scalar @{ $class->traits };
         $self->scope_object($class->scope)->assign_static($class->name, $what);
-        $self->PUSH_PACKAGE($what);
+        my $package_name = $class->name . '::';
+        $self->scope_object($class->scope)->assign_static($package_name, $who);
+        $self->PUSH_CLASS($what);
+        $self->PUSH_PACKAGE($what->who);
         my $ast = $self->lift_decls($class->body);
+        $self->POP_CLASS;
         $self->POP_PACKAGE;
         $ast;
     }

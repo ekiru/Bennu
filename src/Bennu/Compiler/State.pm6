@@ -4,6 +4,7 @@ use Bennu::MOP;
 
 my @!PACKAGE;
 my @!SCOPE;
+my @!CLASS;
 
 submethod BUILD () {
     @!PACKAGE = Bennu::MOP::Package.new(:name<GLOBAL>)
@@ -11,10 +12,15 @@ submethod BUILD () {
 }
 
 method CLASS {
-    for @!PACKAGE -> $package {
-        return $package if $package.type eq 'class';
-    }
-    die '::?CLASS not found.';
+    @!CLASS[*-1];
+}
+
+method PUSH-CLASS ($class) {
+    @!CLASS.push($class);
+}
+
+method POP-CLASS {
+    @!CLASS.pop;
 }
 
 method PACKAGE {

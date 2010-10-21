@@ -2,9 +2,12 @@ module Bennu::MOP;
 
 class Mu {
     has $.how is rw;
+    has $.who is rw;
+    has Bool $.defined is rw;
 }
 
 class Scope is Mu {
+    has $.outer;
 }
 
 class Package is Mu {
@@ -20,9 +23,7 @@ class Package is Mu {
     }
 }
 
-class ClassWHAT is Package {
-    method defined { False }
-    method type { 'class' }
+class ClassWHAT is Mu {
 }
 
 class ClassHOW is Mu {
@@ -31,7 +32,7 @@ class ClassHOW is Mu {
     has @!methods;
 
     method new-type-object {
-        ClassWHAT.new(:how(self), :$.name);
+        ClassWHAT.new(:how(self), :defined(False));
     }
 
     method add-attribute($obj, $attribute) {
