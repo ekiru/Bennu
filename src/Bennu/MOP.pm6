@@ -3,6 +3,7 @@ module Bennu::MOP;
 class Mu {
     has $.how is rw;
     has $.who is rw;
+    has $.repr is rw;
     has Bool $.defined is rw;
 }
 
@@ -38,21 +39,27 @@ class ClassHOW is Mu {
     has $!name is rw;
     has @!attributes;
     has @!methods;
+    has $!instance-repr;
+
+    submethod BUILD(:$!name, :@!attributes, :@!methods, :$!instance-repr) {
+        $!instance-repr .= new(:class($self));
+    }
 
     method new-type-object {
-        ClassWHAT.new(:how(self), :defined(False));
+        $!instance-repr.create-type-object($self);
     }
 
     method add-attribute($obj, $attribute) {
         return $obj.how.add-attribute($obj, $attribute)
           unless $obj.how eqv self;
-        @.attributes.push($attribute);
+        @!attributes.push($attribute);
+        $!instance-repr.add-attribute($attribute);
     }
 
     method add-method($obj, $method) {
         return $obj.how.add-method($obj, method)
           unless $obj.how eqv self;
-        @.methods.push($methods);
+        @!methods.push($methods);
     }
 }
 
@@ -67,4 +74,23 @@ class Method is Scope {
     has $.name;
     has $.body is rw;
     has @.traits;
+}
+
+class REPR is Mu {
+    has $.class; # the how the repr is associated with.
+}
+
+class P6opaqueREPR is REPR {
+}
+
+class LLClassREPR is REPR {
+    has @!attributes;
+
+    method create-type-object($how) {
+        Bennu::MOP::ClassWHAT.new(:$how, :repr(self), :defined(False));
+    }
+
+    method add-attribute($attribute) {
+        @!attributes.push($attribute);
+    }
 }

@@ -37,7 +37,8 @@ multi method lift-decls (Bennu::Decl::Class $class) {
     }
 
     # Build the class meta-objects and properly connect them.
-    my $how = Bennu::MOP::ClassHOW.new(:name($class.name));
+    my $how = Bennu::MOP::ClassHOW.new(:name($class.name),
+                                       :instance-repr($class.repr));
     my $what = $how.new-type-object;
     my $who = Bennu::MOP::Package.new(:name($class.name));
     $what.who = $who;

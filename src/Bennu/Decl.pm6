@@ -6,9 +6,10 @@ class Class is Bennu::Decl {
     has $.name;
     has $.body;
     has @.traits;
-    has Bool $.ll-class
+    has Bennu::MOP::REPR $.repr;
 
-    submethod BUILD (:$.scope = 'our', $!ll-class = False) { }
+    submethod BUILD (:$.scope = 'our',
+                     :$!repr = Bennu::MOP::P6opaqueREPR) { }
 }
 class Method is Bennu::Decl {
     has $.name;
@@ -55,7 +56,7 @@ class Trait {
 
 class LLClassTrait is Trait {
     method apply($class) {
-        $class.ll-class = True;
+        $class.repr = Bennu::MOP::LLClassREPR;
         $class;
     }
 }

@@ -42,15 +42,21 @@ class Bennu::MOP::ClassHOW extends Bennu::MOP::Mu {
                        default => sub { [] });
     has _methods => (is => 'ro', init_arg => 'methods',
                      default => sub { [] });
+    has _instance_repr => (is => 'rw', init_arg => 'instance_repr');
+
+    method BUILD ($args) {
+        $self->_instance_repr($self->_instance_repr->new(class => $self));
+    }
 
     method new_type_object() {
-        Bennu::MOP::ClassWHAT->new(how => $self, defined => 0);
+        $self->_instance_repr->create_type_object($self);
     }
 
     method add_attribute($obj, $attribute) {
         return $obj->how->add_attribute($obj, $attribute)
           unless $obj->how == $self;
         push @{ $self->_attributes }, $attribute;
+        $self->_instance_repr->add_attribute($attribute);
     }
 
     method add_method($obj, $method) {
@@ -71,4 +77,23 @@ class Bennu::MOP::Method extends Bennu::MOP::Scope {
     has name => (is => 'ro');
     has body => (is => 'rw');
     has traits => (is => 'ro', default => sub { [] });
+}
+
+class Bennu::MOP::REPR extends Bennu::MOP::Mu {
+    has class => (is => 'ro'); # the how the repr is associated with.
+}
+
+class Bennu::MOP::P6opaqueREPR extends Bennu::MOP::REPR {
+}
+
+class Bennu::MOP::LLClassREPR extends Bennu::MOP::REPR {
+    has _attributes => (is => 'ro', default => sub { [] });
+
+    method create_type_object($how) {
+        Bennu::MOP::ClassWHAT->new(how => $how, repr => $self, defined => 0);
+    }
+
+    method add_attribute($attribute) {
+        push @{ $self->_attributes }, $attribute;
+    }
 }

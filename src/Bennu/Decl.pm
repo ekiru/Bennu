@@ -14,7 +14,7 @@ class Bennu::Decl::Class extends Bennu::Decl {
     has name => (is => 'ro');
     has body => (is => 'ro');
     has traits => (is => 'ro', default => sub { [] });
-    has ll_class => (is => 'rw', isa => 'Bool', default => 0);
+    has repr => (is => 'rw', default => 'Bennu::MOP::P6opaqueREPR');
 
     method _build_scope () { 'our' }
 }
@@ -65,7 +65,7 @@ class Bennu::Decl::Trait {
 
 class Bennu::Decl::LLClassTrait extends Bennu::Decl::Trait {
     method apply($class) {
-        $class->ll_class(1);
+        $class->repr('Bennu::MOP::LLClassREPR');
         $class;
     }
 }
