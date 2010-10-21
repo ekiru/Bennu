@@ -27,13 +27,34 @@ role Bennu::Compiler::LiftDecls {
     }
 
     multi method lift_decls(ClassDecl $class) {
+        # First, we need to separate the traits that must be applied
+        # before creating the class object from those that must be applied
+        # after creating it.
+        my (@decl_traits, @class_traits);
+        for my $trait (@{ $class->traits }) {
+            if ($trait->isa('Bennu::Decl::Trait')) {
+                push @decl_traits, $trait;
+            } else {
+                push @class_traits, $trait;
+            }
+        }
+
+        # Now we can apply the pre-meta-object traits.
+        for my $trait (@decl_traits) {
+            $trait->apply($class);
+        }
+
+        # Build the class meta-objects and properly connect them.
         my $how = Bennu::MOP::ClassHOW->new(name => $class->name);
         my $what = $how->new_type_object;
         my $who = Bennu::MOP::Package->new(name => $class->name);
         $what->who($who);
 
-        die "Class traits not yet implemented."
-          if scalar @{ $class->traits };
+        # Now we can apply the traits that can be applied directly to
+        # the type-object. This might be wrong.
+        for my $trait (@class_traits) {
+            $trait->apply($who);
+        }
 
         # Set up the type-object and the package in the scope.
         $self->scope_object($class->scope)->assign_static($class->name, $what);
